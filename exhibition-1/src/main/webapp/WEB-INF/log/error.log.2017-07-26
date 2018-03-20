@@ -1,0 +1,33 @@
+2017-07-26 13:24:53  [ DefaultQuartzScheduler_Worker-1:3533 ] - [ ERROR ]  Job DEFAULT.SessionValidationJob threw an unhandled Exception: 
+org.apache.shiro.cache.CacheException: net.sf.ehcache.ObjectExistsException: Cache shiro-activeSessionCache already exists
+	at org.apache.shiro.cache.ehcache.EhCacheManager.getCache(EhCacheManager.java:174)
+	at org.apache.shiro.session.mgt.eis.CachingSessionDAO.createActiveSessionsCache(CachingSessionDAO.java:172)
+	at org.apache.shiro.session.mgt.eis.CachingSessionDAO.getActiveSessionsCacheLazy(CachingSessionDAO.java:152)
+	at org.apache.shiro.session.mgt.eis.CachingSessionDAO.getActiveSessions(CachingSessionDAO.java:343)
+	at org.apache.shiro.session.mgt.DefaultSessionManager.getActiveSessions(DefaultSessionManager.java:244)
+	at org.apache.shiro.session.mgt.AbstractValidatingSessionManager.validateSessions(AbstractValidatingSessionManager.java:280)
+	at org.apache.shiro.session.mgt.quartz.QuartzSessionValidationJob.execute(QuartzSessionValidationJob.java:80)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:202)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:525)
+Caused by: net.sf.ehcache.ObjectExistsException: Cache shiro-activeSessionCache already exists
+	at net.sf.ehcache.CacheManager.addCache(CacheManager.java:1171)
+	at org.apache.shiro.cache.ehcache.EhCacheManager.getCache(EhCacheManager.java:160)
+	... 8 more
+2017-07-26 13:24:53  [ DefaultQuartzScheduler_Worker-1:3539 ] - [ ERROR ]  Job (DEFAULT.SessionValidationJob threw an exception.
+org.quartz.SchedulerException: Job threw an unhandled exception. [See nested exception: org.apache.shiro.cache.CacheException: net.sf.ehcache.ObjectExistsException: Cache shiro-activeSessionCache already exists]
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:213)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:525)
+Caused by: org.apache.shiro.cache.CacheException: net.sf.ehcache.ObjectExistsException: Cache shiro-activeSessionCache already exists
+	at org.apache.shiro.cache.ehcache.EhCacheManager.getCache(EhCacheManager.java:174)
+	at org.apache.shiro.session.mgt.eis.CachingSessionDAO.createActiveSessionsCache(CachingSessionDAO.java:172)
+	at org.apache.shiro.session.mgt.eis.CachingSessionDAO.getActiveSessionsCacheLazy(CachingSessionDAO.java:152)
+	at org.apache.shiro.session.mgt.eis.CachingSessionDAO.getActiveSessions(CachingSessionDAO.java:343)
+	at org.apache.shiro.session.mgt.DefaultSessionManager.getActiveSessions(DefaultSessionManager.java:244)
+	at org.apache.shiro.session.mgt.AbstractValidatingSessionManager.validateSessions(AbstractValidatingSessionManager.java:280)
+	at org.apache.shiro.session.mgt.quartz.QuartzSessionValidationJob.execute(QuartzSessionValidationJob.java:80)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:202)
+	... 1 more
+Caused by: net.sf.ehcache.ObjectExistsException: Cache shiro-activeSessionCache already exists
+	at net.sf.ehcache.CacheManager.addCache(CacheManager.java:1171)
+	at org.apache.shiro.cache.ehcache.EhCacheManager.getCache(EhCacheManager.java:160)
+	... 8 more

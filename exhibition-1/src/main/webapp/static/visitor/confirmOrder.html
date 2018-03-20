@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>确认订单</title>
+    <!--<link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">-->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap3.3.7.min.css">
+    <style type="text/css">
+        header {
+            padding-top: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            font-size: large;
+        }
+        .addressList{
+            border: 1px solid #cccccc;
+            padding-left: 5px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+        }
+        .payTypeItem{
+            border: 1px solid #cccccc;
+            padding-left: 5px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .shipmentTypeItem{
+            border: 1px solid #cccccc;
+            padding-left: 5px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+        .addAddressItem{
+            padding-top: 10px;
+            padding-bottom: 2px;
+            cursor: default;
+        }
+        .cartItem {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border: 1px solid #ccc;
+        }
+        .telephone{
+            padding-left: 15px;
+        }
+        .goodName {
+            margin-top: 10px;
+        }
+        .exhibitsImg{
+            max-width: 100px;
+        }
+        .itemPrice {
+            color: #f4191c;
+            /*padding-top: 20px;*/
+        }
+        .buttomItem{
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<header id="header" class="container">
+    <div class="row">
+        <div onclick="backToIndex();" class="col-md-2 col-sm-2 col-xs-2">
+            <h4><span class="pull-left glyphicon glyphicon-chevron-left"></span></h4>
+        </div>
+        <div class="col-md-10 col-sm-10 col-xs-10" align="center">
+            <h4>确认订单&emsp;&emsp;</h4>
+            <!--&nbsp;&nbsp;&nbsp;&nbsp;-->
+        </div>
+    </div>
+    <!--收货地址-->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion"
+                   href="#collapseOne">
+                    设置收货地址<span class="glyphicon glyphicon-th-large pull-right"></span>
+                </a>
+            </h4>
+        </div>
+        <div id="collapseOne" class="panel-collapse collapse in">
+            <div class="panel-body">
+                <div id="addressContainer">
+                    <!--<div class="addressList row">-->
+                        <!--<div class="col-md-2 col-sm-2 col-xs-2">-->
+                            <!--<input class="address" value="1" type="radio" name="addess" checked="checked">-->
+                        <!--</div>-->
+                        <!--<div class="col-md-10 col-sm-10 col-xs-10">-->
+                            <!--<span class="username">冯宝宝</span><span class="telephone">12354678910</span>-->
+                            <!--<p>湖北省武汉市**区湖北大学</p>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                </div>
+                <div align="center" class="addAddressItem">
+                    <span onclick="addAddress();" class="glyphicon glyphicon-plus">添加收货地址</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--支付方式 0=线下支付，1=在线支付-->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion"
+                   href="#collapseTwo">
+                    选择支付方式<span class="glyphicon glyphicon-th-large pull-right"></span>
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo" class="panel-collapse collapse in">
+            <div class="panel-body">
+                <div class="payTypeItem row">
+                    <div class="col-md-2 col-sm-2 col-xs-2">
+                        <input class="payTppe" value="0" type="radio" name="payTppe" checked="checked">
+                    </div>
+                    <div class="col-md-10 col-sm-10 col-xs-10">
+                        线下支付
+                    </div>
+                </div>
+                <div class="payTypeItem row">
+                    <div class="col-md-2 col-sm-2 col-xs-2">
+                        <input class="payTppe" value="1" type="radio" name="payTppe">
+                    </div>
+                    <div class="col-md-10 col-sm-10 col-xs-10">
+                        在线支付
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--配送方式 0=快递配送（免运费），1=快递配送（运费）,3=自取(默认方式)-->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h4 class="panel-title">
+                <a data-toggle="collapse" data-parent="#accordion"
+                   href="#collapseThree">
+                    选择配送方式<span class="glyphicon glyphicon-th-large pull-right"></span>
+                </a>
+            </h4>
+        </div>
+        <div id="collapseThree" class="panel-collapse collapse in">
+            <div class="panel-body">
+                <div class="shipmentTypeItem row">
+                    <div class="col-md-2 col-sm-2 col-xs-2">
+                        <input class="shipmentType"  value="2" type="radio" name="shipmentType">
+                    </div>
+                    <div class="col-md-10 col-sm-10 col-xs-10">
+                        快递配送
+                    </div>
+                </div>
+                <div class="shipmentTypeItem row">
+                    <div class="col-md-2 col-sm-2 col-xs-2">
+                        <input class="shipmentType" value="3" type="radio" name="shipmentType" checked="checked">
+                    </div>
+                    <div class="col-md-10 col-sm-10 col-xs-10">
+                        自取
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="container" id="cartList">
+    <!--<div class="row cartItem">-->
+        <!--<div class="col-md-9 col-sm-9 col-xs-9" align="center">-->
+            <!--<div class="media">-->
+                <!--<div class="media-left media-middle">-->
+                    <!--<a href="#">-->
+                        <!--<img class="media-object" src="../img/photo.jpg" alt="..."/>-->
+                    <!--</a>-->
+                <!--</div>-->
+                <!--<div class="media-body" align="center">-->
+                    <!--<strong>-->
+                        <!--<p class="goodName media-heading">-->
+                            <!--Herschel Supply Co Roy Billfold Wallet-->
+                        <!--</p>-->
+                    <!--</strong>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+        <!--<div class="col-md-3 col-sm-3 col-xs-3 itemPrice" align="center">-->
+            <!--<strong>￥<span>500</span></strong>-->
+        <!--</div>-->
+    <!--</div>-->
+</div>
+
+
+<footer id="footer">
+    <!--结算或保存-->
+    <div class="main_nav_bottom">
+        <nav class="navbar navbar-default navbar-fixed-bottom">
+            <div class="col-md-12 col-sm-12 col-xs-12 buttomItem ">
+                <h4>
+                    快递费:<span id="shipmentFee" class="shipmentFee" style="color: #f4191c;padding-left: 5px;padding-right: 5px;">0</span>
+                    商品总价:<span id="goodFee" class="goodFee" style="color: #f4191c;padding-left: 5px;"></span>
+                    <span class="pull-right">总共:￥
+                    <span id="totalPrice" style="color: #f4191c;padding-left: 5px;"></span>
+                    </span>
+                </h4>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 buttomItem" align="center">
+                <button onclick="confirmOrder();" type="button" class="btn btn-primary btn-lg btn-block">确认订单</button>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 buttomItem" align="center" style="margin-bottom: 20px;">
+                <button onclick="cancle();" type="button" class="btn btn-default btn-lg btn-block">取消</button>
+            </div>
+        </nav>
+    </div>
+</footer>
+
+<script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+<!--<script src="../js/jquery-3.1.0.js"></script>-->
+<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script src="js/common.js"></script>
+<script src="js/jquery.cityselect.js"></script>
+<script src="js/confirmOrder.js" type="text/javascript"></script>
+</body>
+
+</html>

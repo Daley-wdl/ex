@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <!--<link rel="stylesheet" href="../vaild/dist/css/bootstrapValidator.css"/>-->
+    <!--<script src="../vaild/dist/js/bootstrapValidator.min.js"></script>-->
+</head>
+<body>
+<form id="form" class="layui-form" action="javascript:void(0);">
+    <div class="layui-form-item">
+        <label class="layui-form-label">展商名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="realName" id="realName" lay-verify="required" autocomplete="off" placeholder="请输入名称"
+                   class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">手机号码</label>
+            <div class="layui-input-inline">
+                <input type="tel" name="phone" lay-verify="phone" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">邮箱</label>
+            <div class="layui-input-inline">
+                <input type="text" name="email" lay-verify="email" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item layui-form-text">
+        <label class="layui-form-label">简介</label>
+        <div class="layui-input-block">
+            <textarea placeholder="请输入内容" lay-verify="required" class="layui-textarea" name="intro"></textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" onclick="sendForm();" lay-submit="" lay-filter="demo1">立即提交</button>
+            <button id="resetBtn" type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+</body>
+<script src="../js/jquery.min.js"></script>
+<script src="../layui/layui.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript">
+    layui.use('layer', function(){
+        layer = layui.layer ;
+    });
+
+    function sendForm() {
+        //如果用户名不为空，则进行敏感词过滤
+        var realName = $("#realName").val();
+        if (realName==null || realName=='') {
+            layer.msg("用户名不能为空");
+            return false;
+        }
+        realName = filter(realName);
+
+        layer.msg("确定修改?",{
+            time:0,
+            btn:["yes","no"],
+            yes:function () {
+                editExhibitorInfo();
+            }
+        })
+
+    }
+
+    function editExhibitorInfo() {
+        $.ajax({
+            type: "post",
+            url: getRootPath() + "/exhibitor/editExhibitor",
+            data: $("#form").serialize(),
+            dataType:"json",
+            error: function (request,status,error) {
+                layer.msg("请求出现错误:"+request.status+"\n错误信息:"+request.responseText+"\n您可以联系管理员或退出后重新登录",{
+                    icon:5,
+                    time:0,
+                    btn:["重新登录","返回"],
+                    yes:function () {
+                        window.location.href=getRootPath()+"/common/login";
+                    }
+                });
+            },
+            success: function (data,status) {
+                console.log(status);
+                if (parseInt(data.status)==0) {
+                    console.log("修改失败!");
+                    var toShow="修改失败!";
+                    if (data.message!=null) {
+                        toShow += "\n" + data.message;
+                    }
+                    layer.msg(toShow,{
+                        time:2000,
+                        icon:5
+                    });
+                } else {
+                    console.log("修改成功");
+                    layer.msg("修改成功!",{
+                        time:2000,
+                        icon:6
+                    });
+                }
+                $("#resetBtn").click();
+            }
+        });
+    }
+
+</script>
+</html>

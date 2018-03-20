@@ -1,0 +1,105 @@
+@charset "utf-8";
+.con1{
+	/*background: aliceblue;*/
+	width: 100%;
+	margin-top: 0px;
+}
+.con2{
+	width: 1100px;
+	margin: 0 auto;
+}
+.layui-field-title{
+	margin-top: 0px;
+}
+.fie{
+	padding-top: 20px;
+}
+
+
+.panel{ background-color:#fff; border:solid 1px transparent;margin: 15px;}
+.panel-header{ 
+	border-bottom:solid 1px transparent; 
+	padding:8px 15px; 
+	font-size:16px; 
+	font-weight:700;
+	height: 40px;
+}/*面板标题*/
+.panel-body{ padding:15px; height: 160px;}/*面板内容*/
+.panel-footer{background-color: #f5f5f5;border-top: 1px solid #ddd;padding:5px 20px}/*面板页脚*/
+/*默认面板*/
+.panel-default{border-color:#ddd}
+.panel-default > .panel-header{ border-color:#ddd; background-color:#f5f5f5; color:#444}
+
+#riqi,#dingdanhao,.lxsj,.mingc{
+	float: left;
+	margin-right: 30px;
+	line-height: 40px;
+}
+.Hui-iconfont-kefu{
+	color: #009688;;
+}
+.checked{
+	float: left;
+	line-height: 40px;
+	margin-right: 10px;
+}
+.ddimg{
+	float: left;
+}
+#nameofshop{
+	color:#19A093;
+}
+.ddname{
+	width: 170px;
+	height: 160px;
+	float: left;
+	margin-left: 30px;
+	font-family: "微软雅黑";
+	font-size: 14px;
+	/*background-color: peachpuff;*/
+	padding: 3px;
+	border-radius: 19px;
+}
+.ddname b{
+	padding: 5px;
+}
+.dianpu{
+	width: 150px;
+	height: 45px;
+	padding: 10px;
+	border-bottom: 1px solid #CCCCCC;
+}
+
+.dianming{
+	width: 150px;
+	height: 50px;
+	padding: 5px;
+}
+.ddnum{
+	width: 100px;
+	height: 110px;
+	float: left;
+	margin-left: 30px;
+	padding: 20px;
+	/*background-color: peachpuff;*/
+	border-radius: 19px;
+	
+}
+.ddprice{
+	width: 100px;
+	height: 110px;
+	float: left;
+	margin-left: 30px;
+	padding: 20px;
+	background-color: peachpuff;
+	border-radius: 19px;
+}
+.ddprice2{
+	padding: 20px;
+}
+.danjia{
+	width: 100px;
+	height: 25px;
+	border-bottom: 1px solid #CCCCCC;
+	padding:10px;
+}

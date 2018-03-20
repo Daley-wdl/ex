@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css"/>
+    <!--<link rel="stylesheet" href="../css/bootstrap.min.css"/>-->
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css"/>
+    <title>展品详情</title>
+    <style>
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    <form id="sendForm" class="layui-form" action="">
+        <div class="layui-form-item">
+            <label class="layui-form-label">展品名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="exhibitsName" name="exhibitsName" lay-verify="required|sensitiveWord|exhibitsName" autocomplete="off" placeholder="请输入名称" class="layui-input canedit">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">类别</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="category"  name="category" lay-verify="required|sensitiveWord|category" placeholder="请输入类别" autocomplete="off" class="layui-input canedit">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">数量</label>
+            <div class="layui-input-inline">
+                <input type="text" id="number"  name="number" lay-verify="required|number|totalNum" placeholder="请输入上架数量" autocomplete="off" class="layui-input canedit">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">价格</label>
+            <div class="layui-input-inline">
+                <input type="text" id="price"  name="price" lay-verify="required|number|price" placeholder="请输入价格" autocomplete="off" class="layui-input canedit">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">封面</label>
+            <div class="layui-input-block">
+                <img id="mainPhotoPath" src="#" class="img-responsive">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">简介</label>
+            <div class="layui-input-block">
+                <textarea id="intro" lay-verify="required|sensitiveWord|intro" class="layui-textarea canedit" placeholder="请输入展品简介" name="intro"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="editExhibits">立即提交</button>
+                <button type="button" id="applyEditBtn" class="layui-btn layui-btn-primary">编辑</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+<script src="../js/jquery-3.1.0.js"></script>
+<script src="../layui/layui.js"></script>
+<script src="../js/common.js"></script>
+<script type="text/javascript">
+    editable = false;
+    id = GetUrlParam('id');//展品id
+    layui.use(['layer', "form"], function (){
+        var layer = layui.layer;
+        var form = layui.form;
+
+        $("#applyEditBtn").click(function () {
+            editable = !editable;
+            if (editable) {
+                $("input").attr("disabled",true);
+//                $(".canedit").attr("disabled",false);
+                $.each($(".canedit"),function (index,item) {
+                    $(item).attr("disabled",false);
+                })
+                layer.msg("您现在可以进行编辑");
+            } else {
+                $("input").attr("disabled",true);
+                $("text").attr("disabled",true);
+                layer.msg("退出编辑");
+            }
+        });
+
+        //表单验证
+        form.verify({
+            exhibitsName:function (value, item) {//value：表单的值、item：表单的DOM对象
+                var len = value.length;
+                if (len>50) {
+                    return "长度在1-50之间!";
+                }
+            },
+            sensitiveWord:function (value, item) {
+                var tmp = filter(value);
+                if (tmp.indexOf("*")!=-1) {
+                    return '包含不合法字符!';
+                }
+            },
+            category:function (value) {
+                if (value.length>10) {
+                    return '长度在1-10之间';
+                }
+            },
+            intro:function (value) {
+                if (value.length>100) {
+                    return '长度在1-200之间';
+                }
+            },
+            totalNum:function (value) {
+                if (value>1000000) {
+                    return '输入数量过大!';
+                }
+            },
+            price:function (value) {
+                if (value>1000000) {
+                    return '最高价格为1,000,000，如需要请通知管理员修改';
+                }
+            }
+        });
+        
+        //提交表单
+        form.on("submit(editExhibits)",function (data) {
+            if (!editable) {
+                layer.msg("请点击编辑并修改信息后再提交!");
+                return false;
+            }
+            var exhibitsName = data.field["exhibitsName"];
+            var intro = $("#intro").val();
+            var category = data.field["category"];
+            var price = data.field["price"];
+            var number = data.field["number"];
+//            exhibitsName = filter(exhibitsName);
+//            intro = filter(intro);
+//            category = filter(category);
+            layer.load(1);
+            $.ajax({
+                url:getRootPath()+"/exhibits/updateExhibits",
+                type:"post",
+                async:false,
+                data:{id:id,exhibitsName:exhibitsName,intro:intro,category:category,price:price,number:number},
+                error:function (request, textStatus, errorThrown) {
+                    layer.closeAll('loading');
+                    console.log('网络出现故障--错误信息如下:'+request.responseText);
+                    layer.msg("发布失败！\n网络出现故障，错误信息在控制台中打印,请与管理员联系!",{
+                        icon:5,
+                        time:0,
+                        btn:['OK'],
+                        yes:function (index) {
+                            layer.close(index);
+                        }
+                    });
+                },
+                success:function (data,status) {
+                    console.log('请求返回状态'+status);
+                    if (data.status!=1) {
+                        layer.msg("更新失败!\n"+data.message,{
+                            icon:5,
+                            time:0,
+                            btn:["OK"],
+                            yes:function (index) {
+                                layer.close(index);
+                            }
+                        })
+                    } else {
+                        layer.msg("更新成功",{
+                            time:0,
+                            icon:6,
+                            btn:["确定","取消"],
+                            yes:function (index) {
+                                //关闭当前页面，刷新父窗口
+                                layer.close(index);
+                                window.close();
+                            }
+                        });
+                    }
+                }
+            });
+            layer.closeAll('loading');
+
+            return false;
+        });
+
+        //init
+        init(id);
+    });
+
+    function init(id) {
+        $.ajax({
+            type:"get",
+            url:getRootPath()+"/exhibits/selectExhibitsById",
+            data:{id:id},
+            async:false,
+            error:function (request) {
+                console.log(request.responseText);
+                layer.msg("请求发生错误，返回信息已打印到控制台，请和管理员联系!");
+            },
+            success:function (data,status) {
+//                console.log("请求状态:" + status);
+//                console.log(data.code);
+                if (data) {
+                    $("#exhibitsName").val(data['exhibitsName']);
+                    $("#number").val(data['number']);
+                    $("#price").val(data['price']);
+                    $("#category").val(data['category']);
+                    $("#mainPhotoPath").attr("src",data['mainPhotoPath']);
+                    $("#intro").val(data['intro']);
+
+                    editable = false;
+                    $("input").attr("disabled",true);
+                    $("#intro").attr("disabled",true);
+                } else {
+                    layer.msg("获取展品详情信息失败!")
+                }
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

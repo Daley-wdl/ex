@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>展会智能管理系统</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <link rel="stylesheet" href="../css/index.css" />
+    <script type="text/javascript" src="../js/jquery.js"></script>
+    <script type="text/javascript" src="../kd/kindeditor-min.js"></script>
+    <script type="text/javascript" src="../js/vue.js" ></script>
+    <script type="text/javascript" src="../js/common.js"></script>
+    <style>
+        .info .z_content{
+            display: none;
+        }
+
+        .info .z_content:first-child{
+            display: block;
+        }
+        .exhibitor_photo{
+            width: 70px;
+            height: 70px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        body{
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">超级管理员系统</div>
+
+        <ul class="layui-nav layui-layout-right">
+            <a class="layui-nav-item" onclick="quit();" href="javascript:void(0);" style="color: forestgreen">退出</a>
+        </ul>
+    </div>
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll  menu">
+            <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">管理员管理</a>
+                    <dl class="layui-nav-child">
+                        <dd class="z_item"><a href="javascript:;">已通过管理员</a></dd>
+                        <dd class="z_item"><a href="javascript:;">普通会员</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-body">
+        <!-- 内容主体区域 -->
+        <div  class='info' id="suAdmin">
+            <div class="z_content">
+                <!--已通过审核展品-->
+                <div class="embed-responsive">
+                    <iframe class='embed-responsive-item' width="103%" height="100%" style="min-height: 800px;" src="adminManage/getAdmins.html" allowtransparency="true" allowfullscreen="true" allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+                </div>
+            </div>
+            <div class="z_content">
+                <!--已通过审核展品-->
+                <div class="embed-responsive">
+                    <iframe class='embed-responsive-item' width="103%" height="100%" style="min-height: 800px;" src="adminManage/getUsers.html" allowtransparency="true" allowfullscreen="true" allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-footer">
+        <!-- 底部固定区域 -->
+        <center>湖北大学教务管理系统</center>
+    </div>
+</div>
+<script src="../layui/layui.js"></script>
+<script>
+    //退出登录
+    function quit() {
+        $.ajax({
+            type: "post",
+            url: getRootPath() + "/common/logout",
+            async: false,
+            complete: function (request, status) {
+                if (request.status == 200) {
+                    var responseText = request.responseText;
+                    var data = JSON.parse(responseText);
+                    if (data.status == 1) {
+                        window.location.href = getRootPath() + "/common/login";
+                    } else {
+                        if (data.message != null) {
+                            alert("请求失败:\n" + data.message);
+                        }
+                        window.location.href = getRootPath() + "/common/login";
+                    }
+                } else {
+                    alert("请求出现错误，请重新登录");
+                    window.location.href = getRootPath() + "/common/login";
+                }
+            }
+        });
+//        window.location.href = getRootPath() + "/";
+    }
+
+    //JavaScript代码区域
+    layui.use('element', function(){
+        var element = layui.element;
+
+    });
+    //点击左边显示右边对应内容
+
+    $('.menu .z_item').click(function(){
+        idx=$(this).index('.menu .z_item');
+
+        var selectItm = $('.info .z_content').eq(idx).children("div").children("iframe");
+        selectItm.attr('src',selectItm.attr("src"));//点击后刷新frame
+
+        $('.info .z_content').eq(idx).show();
+        $('.info .z_content').not($('.info .z_content').eq(idx)).hide();
+        // alert($('.info .z_content').eq(idx).find('.embed-responsive-item').src());
+    });
+
+
+    //编辑框
+    KindEditor.ready(function(K) {
+        editor = K.create('#tid'
+            ,{
+                resizeType : 2,
+                allowPreviewEmoticons : false,
+                allowImageUpload : true,
+                items : [
+                    'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                    'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                    'insertunorderedlist', '|', 'emoticons', 'image', 'link'
+                ],
+            }
+        );
+    });
+</script>
+</body>
+</html>

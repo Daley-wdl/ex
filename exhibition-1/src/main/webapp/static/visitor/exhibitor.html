@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap3.3.7.min.css">
+    <style type="text/css">
+        header {
+            padding-top: 20px;
+            padding-bottom: 10px;
+            font-size: large;
+            border-bottom: 1px solid #ccc;
+        }
+        #exhibitList .media{
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #cccccc;
+        }
+        .moreBtn{
+            margin-top: 20px;
+        }
+        .exhibitImg{
+            max-width: 150px;
+        }
+    </style>
+</head>
+<body>
+
+<header id="header" class="container">
+    <div class="row">
+        <div><span onclick="backToIndex();" class="pull-left glyphicon glyphicon-chevron-left"
+                   style="padding-left: 5px;">返回</span></div>
+        <div align="center">
+            <strong>店铺&emsp; &emsp; </strong>
+        </div>
+    </div>
+
+</header>
+
+<div class="container">
+
+
+    <div id="exhibitList">
+        <!--<div class="media" onclick="exhibitsDetail(id);">-->
+            <!--<div class="media-left media-middle">-->
+                <!--<a href="#">-->
+                    <!--<img style="max-width: 200px;" class="media-object" src="../img/photo.jpg" alt="..."/>-->
+                <!--</a>-->
+            <!--</div>-->
+            <!--<div class="media-body">-->
+                <!--<h5 class="goodName media-heading">-->
+                    <!--冯宝宝展品介绍展品介绍展品冯宝宝展品介绍展-->
+                <!--</h5>-->
+                <!--<p class="price">￥200</p>-->
+                <!--<div class="text-muted ">-->
+                    <!--<span>展品名</span>-->
+                    <!--<span style="color: #f4191c" class="glyphicon glyphicon-fire pull-right">5</span>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+
+    </div>
+
+    <div align="center" class="moreBtn">
+        <a id="moreBtn" onclick="moreExhibits();" href="javascript:void(0);" class="btn btn-default btn-lg">查看更多</a>
+    </div>
+</div>
+
+<script src="../js/jquery-3.1.0.js"></script>
+<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript">
+
+    var id = GetUrlParam("id");
+    var page = 1;
+    var size = 15;
+    $(function () {
+        init();
+    });
+    function init() {
+        getExhibits();
+    }
+
+    function moreExhibits() {
+        page++;
+        getExhibits();
+    }
+
+    function getExhibits() {
+        if (id==null) {
+            window.location.href = "index.html";
+        }
+        $.ajax({
+            url: getRootPath() + "/search/getExhibitsByExhibitorId"
+            ,async:false
+            ,data:{exhibitorId:id,page:page,size:size}
+            ,error:function (req) {
+                console.log(req);
+                layer.open({content: "请求发生错误，请重试"});
+            }
+            ,success:function (data) {
+                if (data.code==0) {
+                    if (data.data.length<size) {
+                        $("#moreBtn").hide();
+                    }
+                    $.each(data.data,function (index, item) {
+                        addExhibitsToDom(item);
+                    });
+                }
+                if (data.code==1) {
+                    layer.open({content: data.message});
+                }
+            }
+        });
+    }
+
+    function addExhibitsToDom(exhibit) {
+        var html='<div class="media" onclick="exhibitsDetail('+exhibit["id"]+');">' +
+            '            <div class="media-left media-middle">\n' +
+            '                <a href="javascript:void(0);">\n' +
+            '                    <img class="media-object exhibitImg" src="'+exhibit["mainPhotoPath"]+'">' +
+            '                </a>' +
+            '            </div>' +
+            '            <div class="media-body">\n' +
+            '                <h5 class="goodName media-heading">\n' +
+            exhibit["exhibitsName"] +
+            '                </h5>\n' +
+            '                <p class="price">'+exhibit["price"]+'</p>\n' +
+            '                <div class="text-muted ">\n' +
+            '                    <span>'+exhibit['exhibitorName']+'</span>\n' +
+            '                    <span style="color: #f4191c" class="glyphicon glyphicon-fire pull-right">'+exhibit["category"]+'</span>\n' +
+            '                </div>\n' +
+            '            </div>\n' +
+            '        </div>';
+
+        $("#exhibitList").append(html);
+    }
+
+    function backToIndex() {
+        window.location.href = "index.html";
+    }
+</script>
+</body>
+</html>

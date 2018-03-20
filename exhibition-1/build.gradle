@@ -1,0 +1,107 @@
+group 'com.exhibition'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'war'
+
+sourceCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
+
+
+dependencies {
+    providedCompile (
+//            'javaee:javaee-api:5',//删除该依赖后，测试类正常运行
+            'org.apache.tomcat:servlet-api:6.0.53',
+            'javax.servlet:jstl:1.1.2',
+            'taglibs:standard:1.1.2'
+    )
+    compile(
+            //spring
+            'org.springframework:spring-aop:4.3.7.RELEASE',
+            'org.springframework:spring-beans:4.3.7.RELEASE',
+            'org.springframework:spring-context:4.3.7.RELEASE',
+            'org.springframework:spring-core:4.3.7.RELEASE',
+            'org.springframework:spring-orm:4.3.7.RELEASE',
+            'org.springframework:spring-expression:4.3.7.RELEASE',
+            'org.springframework:spring-web:4.3.7.RELEASE',
+            'org.springframework:spring-webmvc:4.3.7.RELEASE',
+            'org.springframework:spring-tx:4.3.7.RELEASE',
+            'org.springframework:spring-jdbc:4.3.7.RELEASE',
+            'org.springframework:spring-test:4.3.7.RELEASE',
+            //mybatis
+            'org.mybatis:mybatis:3.4.4',
+            'org.mybatis:mybatis-spring:1.3.1',
+            //mysql
+            'mysql:mysql-connector-java:5.1.5',
+            'c3p0:c3p0:0.9.1.2',
+            //commons
+            'commons-logging:commons-logging:1.2',
+            'commons-dbcp:commons-dbcp:20030825.184428',
+            'commons-lang:commons-lang:20030203.000129',
+            'commons-fileupload:commons-fileupload:1.3.2',
+            'commons-io:commons-io:2.5',
+            //log4j
+            'log4j:log4j:1.2.17',
+            'org.slf4j:slf4j-api:1.8.0-alpha2',
+            'org.slf4j:slf4j-log4j12:1.8.0-alpha2',
+
+            'org.codehaus.jackson:jackson-core-lgpl:1.9.13',
+            'org.codehaus.jackson:jackson-mapper-lgpl:1.9.13'
+
+    )
+    //gson
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.0'
+
+    //aop所需包
+    //aop
+    compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.8.10'
+    compile group: 'aopalliance', name: 'aopalliance', version: '1.0'
+
+    //整合shiro所需jar包
+    compile 'org.apache.shiro:shiro-core:1.4.0'
+    compile 'org.apache.shiro:shiro-web:1.4.0'
+    compile 'org.apache.shiro:shiro-spring:1.4.0'
+    compile group: 'org.apache.shiro', name: 'shiro-ehcache', version: '1.4.0'
+    compile group: 'org.apache.shiro', name: 'shiro-quartz', version: '1.4.0'
+    //用于shiro缓存
+    compile group: 'net.sf.ehcache', name: 'ehcache-core', version: '2.6.10'
+
+
+    //jedis依赖
+    compile 'redis.clients:jedis:2.9.0'
+
+    // quartz
+//    compile group: 'org.quartz-scheduler', name: 'quartz', version: '2.2.2'
+    //spring-context-support
+    compile group: 'org.springframework', name: 'spring-context-support', version: '4.3.7.RELEASE'
+
+    //protostuff依赖
+    compile group: 'com.dyuproject.protostuff', name: 'protostuff-core', version: '1.0.12'
+    compile group: 'com.dyuproject.protostuff', name: 'protostuff-runtime', version: '1.0.12'
+
+    //valid注解
+//    compile 'javax.validation:validation-api:2.0.0.Beta2'
+
+    runtime(
+            "jstl:jstl:1.2"
+    )
+    //test
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile "org.springframework:spring-test:4.3.7.RELEASE"
+
+    //solrJ
+    compile group: 'org.apache.solr', name: 'solr-solrj', version: '7.1.0'
+
+    //数据验证
+    compile group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.0.4.Final'
+
+    // https://mvnrepository.com/artifact/com.github.axet/kaptcha
+    compile group: 'com.github.axet', name: 'kaptcha', version: '0.0.9'
+}

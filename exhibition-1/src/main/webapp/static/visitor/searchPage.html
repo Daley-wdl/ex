@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>搜索页</title>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap3.3.7.min.css">
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/jqueryui/1.9.2/themes/vader/jquery-ui.css">
+    <style type="text/css">
+        .searcherGroup {
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        .title {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-top: 2px solid #ccc;
+            border-bottom: 2px solid #ccc;
+        }
+
+        .buttonLIst button {
+            margin-left: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<header class="container searcherGroup">
+    <div class="input-group input-group-lg">
+        <span class="input-group-addon glyphicon glyphicon-search" onclick="searchByInput();"></span>
+        <input type="search" id="searcher" class="form-control" placeholder="四处看看">
+        <a href="index.html" class="input-group-addon"><span>取消</span></a>
+    </div>
+
+</header>
+
+<div id="body" class="container">
+
+    <!--热门搜索标题、buttons-->
+    <div>
+        <h4 class="title text-muted">
+            热门搜索
+        </h4>
+        <div class="buttonLIst" id="buttonLIst">
+
+        </div>
+        <div align="center">
+            <a id="moreCategoryBtn" onclick="moreCategory();" href="javascript:void(0);" class="btn btn-default">查看更多分类</a>
+        </div>
+    </div>
+</div>
+
+
+<footer>
+
+</footer>
+
+<!--<script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>-->
+<script src="https://apps.bdimg.com/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="http://apps.bdimg.com/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+<!--<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>-->
+<script src="layer_mobile/layer.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript">
+    var pageOffset = 0;
+
+    $(function () {
+        getCategory();
+
+        $("#searcher").autocomplete({
+            source: function( request, response ) {
+                $.ajax({
+                    url: getRootPath() + '/search/suggest', // 后台请求路径
+                    dataType: "json",
+                    data:{
+                        "queryStr": request.term    // 获取输入框内容
+                    },
+                    success: function(data) {
+                        response(data.data);
+                    }
+                });
+            },
+            minLength: 2,  // 输入框字符个等于2时开始查询
+            select: function(event, ui) { // 选中某项时执行的操作
+                var key = ui.item.label;
+                // 存放选中选项的信息
+                window.location.href = "searchResult.html?key=" + key+"&type=exhibitsName";
+            }
+        });
+    });
+
+    function moreCategory() {
+        getCategory();
+    }
+
+    function getCategory() {
+        var size = 10;
+        $.ajax({
+            url: getRootPath() + "/search/getCategory"
+            , data: {size: size,offset:pageOffset}
+            , error: function (req) {
+                console.log(req.responseText);
+                layer.open({
+                    content: "获取热门分类推荐失败，请检查网络"
+                    , skin: "msg"
+                    , time: 2
+                });
+            }
+            , success: function (data) {
+                if (data.code==0) {
+                    if (data.count==0) {
+                        layer.open({
+                            content: '臣妾实在时给不了更多了'
+                            , skin: 'msg'
+                            , time: 2
+                        });
+                        $("#moreCategoryBtn").hide();
+                        return false;
+                    }
+                    pageOffset += data.count;
+                    $.each(data.data, function (index, item) {
+                        var categoryName = item["category"];
+                        var categoryCount = item['count'];
+                        var text = categoryName + ' (' + categoryCount + ')';
+                        //<button type="button" class="btn btn-default">赳赳老秦</button>
+                        var html = '<button type="button" onclick="searchByCategory(\''+categoryName+'\');" ' +
+                            'class="btn btn-default">' + text + '</button>';
+                        $("#buttonLIst").append(html);
+                    });
+                }
+                if (data.code==1) {
+                    layer.open({
+                        content: '获取分类信息失败，请刷新重试'
+                        , skin: 'msg'
+                        , time: 2
+                    });
+                }
+            }
+        });
+    }
+
+    function searchByCategory(value) {
+        window.location.href = "searchResult.html?key=" + value + "&type=category";
+    }
+
+    function searchByInput() {
+        var value = $("#searcher").val();
+        if (value==null||value==""){
+            layer.open({
+                content:"您还没有输入.."
+                ,skin:"msg"
+                ,time:2
+            });
+            return false;
+        }
+
+        window.location.href="searchResult.html?key=" + value + "&type=exhibitsName";
+
+    }
+</script>
+</body>
+
+</html>

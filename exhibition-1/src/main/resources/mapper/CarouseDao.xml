@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.CarouseDao">
+
+    <insert id="insert" parameterType="Carouse" useGeneratedKeys="true" keyProperty="id">
+        insert into carouse (img_path, submit_date, submitter_name, detail, sort)
+        values (#{imgPath}, #{submitDate}, #{submitterName}, #{detail}, #{sort})
+    </insert>
+
+    <delete id="delate" parameterType="int">
+        DELETE FROM carouse WHERE id=#{value}
+    </delete>
+
+    <!-- 修改 -->
+    <update id="update" parameterType="Carouse">
+        UPDATE carouse
+        <set>
+            <if test="imgPath!=null">
+                img_path = #{imgPath},
+            </if>
+            <if test="detail!=null">
+                detail = #{detail},
+            </if>
+            <if test="sort!=null">
+                sort = #{sort},
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="getCarouseListForUser" parameterType="int" resultType="Carouse">
+        select id,img_path,sort from carouse
+        ORDER BY submit_date DESC
+        limit 0,#{value}
+    </select>
+
+</mapper>

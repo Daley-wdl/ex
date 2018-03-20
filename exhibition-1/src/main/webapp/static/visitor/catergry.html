@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>分类</title>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
+    <style type="text/css">
+        body{
+        }
+        header{
+            margin-bottom: 10px;
+        }
+        .catergryContainer{
+        }
+        .catergryItem{
+            padding-top: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid tomato;
+
+        }
+        .catergryItem strong{
+            padding-left: 10px;
+        }
+        .recommendTitle{
+
+        }
+    </style>
+</head>
+
+<body>
+<header class="container">
+    <!--back、search -->
+    <div class="input-group input-group-lg">
+        <a href="index.html" class="input-group-addon"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <div>
+            <!--<span class="input-group-addon glyphicon glyphicon-search"></span>-->
+            <input type="text" id="searcher" class="form-control" placeholder="四处看看">
+        </div>
+        <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="row">
+        <div id="catergryContainer" class="col-md-3 col-sm-3 col-xs-3 catergryContainer">
+            <div class="catergryItem"><strong>热门推荐</strong></div>
+            <div class="catergryItem"><strong>游戏</strong></div>
+            <div class="catergryItem"><strong>音乐</strong></div>
+            <div class="catergryItem"><strong>电脑办公</strong></div>
+            <div class="catergryItem"><strong>女装</strong></div>
+            <div class="catergryItem"><strong>男装</strong></div>
+            <div class="catergryItem"><strong>男鞋</strong></div>
+            <div class="catergryItem"><strong>女鞋</strong></div>
+            <div class="catergryItem"><strong>美食</strong></div>
+        </div>
+        <div class="col-md-9 col-sm-9 col-xs-9 ">
+            <div id="recommendExhibitors">
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <a href="#">
+                            <img class="media-object" src="../img/photo.jpg" alt="..."/>
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h5 class="goodName media-heading">
+                            冯宝宝展品介绍展品介绍展品冯宝宝展品介绍展
+                        </h5>
+                        <p class="price">￥200</p>
+                        <div class="text-muted ">
+                            <span>展品名</span>
+                            <span style="color: #f4191c" class="glyphicon glyphicon-fire pull-right">5</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="media">
+                    <div class="media-left media-middle">
+                        <a href="#">
+                            <img class="media-object" src="../img/photo.jpg" alt="..."/>
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h5 class="goodName media-heading">
+                            冯宝宝展品介绍展品介绍展品冯宝宝展品介绍展
+                        </h5>
+                        <p class="price">￥200</p>
+                        <div class="text-muted ">
+                            <span>展品名</span>
+                            <span style="color: #f4191c" class="glyphicon glyphicon-fire pull-right">5</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<footer>
+    <!--底部首页、购物车、个人信息-->
+</footer>
+
+<script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript">
+$(function () {
+   $("#searcher").focus(function () {
+       window.location.href = "searchPage.html";
+   }) ;
+});
+
+
+
+function getCategory() {
+    layer.open({
+        content:'loading...'
+        ,type:2
+    });
+    $.ajax({
+        url:getRootPath()+"/search/getCategory"
+        ,async:false
+        ,data:{size:10}
+        ,error:function (req) {
+            console.log(req);
+            layer.open({
+                content:'获取数据出现错误,请重试...'
+                ,btn:["确定",'取消']
+                ,yes:function () {
+                    location.reload();
+                }
+            })
+        }
+        ,success:function (data) {
+            if (data.code==0) {
+                $.each(data.data, function (index, item) {
+                    addCategoryToDom(item);
+                });
+            }
+        }
+    })
+}
+
+function addCategoryToDom(category) {
+    var html='<div onclick="getExhibitsByCategory("'+category+'");" class="catergryItem"><strong>'+category+'</strong></div>';
+    $("#catergryContainer").append(html);
+}
+
+function getExhibitsByCategory(categoty) {
+    window.location.href = "searchResult.html?key=" + categoty + "&type=category";
+}
+
+</script>
+</body>
+
+</html>

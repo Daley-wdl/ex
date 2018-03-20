@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>展会首页</title>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
+    <style type="text/css">
+        .goodName {
+            padding-top: 5px;
+        }
+
+        .price {
+            color: #f4191c;
+        }
+
+        .title {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-color: papayawhip;
+        }
+        .exhibitImg{
+            max-width: 150px;
+        }
+        .title-icon {
+            color: #f4191c;
+            padding-right: 15px;
+        }
+        #exhibitList .media{
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #cccccc;
+        }
+        footer div{
+            padding-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<header class="container">
+    <!--顶部分类icon、搜索栏、登录icon -->
+    <div class="input-group input-group-lg">
+        <span class="input-group-addon glyphicon glyphicon-search"></span>
+        <input type="text" id="searcher" class="form-control" placeholder="四处看看">
+        <span class="input-group-addon">
+            <a href="index.html">
+                <span class="glyphicon glyphicon-home"></span>
+            </a>
+        </span>
+    </div>
+</header>
+
+<div id="body" class="container">
+    <!--热门展品、新上架展品列表-->
+    <div>
+        <h3 class="title">
+            <span class="title-icon glyphicon glyphicon-star"></span>
+            搜索结果
+        </h3>
+        <div id="exhibitList">
+            <!--<div class="media" onclick="exhibitsDetail(id);">-->
+                <!--<div class="media-left media-middle">-->
+                    <!--<a href="#">-->
+                        <!--<img class="media-object" src="../img/photo.jpg" alt="..."/>-->
+                    <!--</a>-->
+                <!--</div>-->
+                <!--<div class="media-body">-->
+                    <!--<h5 class="goodName media-heading">-->
+                        <!--冯宝宝展品介绍展品介绍展品冯宝宝展品介绍展-->
+                    <!--</h5>-->
+                    <!--<p class="price">￥200</p>-->
+                    <!--<div class="text-muted ">-->
+                        <!--<span>展品名</span>-->
+                        <!--<span style="color: #f4191c" class="glyphicon glyphicon-fire pull-right">5</span>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        </div>
+
+    </div>
+</div>
+
+
+<footer>
+    <!--分页-->
+    <div class="container">
+        <a class="btn btn-primary" onclick="prePage();" id="prePage" style="padding-left: 20px;">上一页</a>
+        <a class="btn btn-primary pull-right" onclick="nextPage();" id="nextPage"  style="padding-right: 20px;">下一页</a>
+    </div>
+</footer>
+
+<script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>
+<script src="js/common.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script type="text/javascript">
+    var count = 0;
+    var page = 1;
+    var key = decodeURI(GetUrlParam('key'));
+    var field = decodeURI(GetUrlParam('type'));
+    $(function () {
+        if (field==null||field=="")
+            field = "exhibitsName";
+        $("#searcher").focus(function () {
+            window.location.href = "searchPage.html";
+        });
+        init();
+    });
+
+    function init() {
+        setPage(1);
+        if (field==null||field=="")
+            field = "exhibitsName";
+        search(field, key, page, getSize());
+    }
+
+    function getSize() {
+        return 15;
+    }
+
+    function setPage(value) {
+        page = value;
+        if (page==1) {
+            $("#prePage").hide(200);
+        }
+    }
+
+    function prePage() {
+        if (page-1<=0) {
+            layer.open({
+               content:"已经是第一页..."
+               ,time:2
+               ,skin:"msg"
+            });
+            return false;
+        }
+        setPage(page-1);
+        search(field, key, page, getSize());
+    }
+
+    function nextPage() {
+        var totelPage = Math.ceil(count / getSize());
+        if (page>=totelPage) {
+            layer.open({
+                content:"已经是最后一页..."
+                ,time:2
+                ,skin:"msg"
+            });
+            return false;
+        }
+        setPage(page+1);
+        search(field, key, page, getSize());
+    }
+
+    function search(field,key,page,size) {
+        layer.open({
+            type: 2
+            ,content: '正在疯狂加载中...'
+        });
+        $.ajax({
+            url:getRootPath()+"/search/simpleSearch",
+            async:false,
+            data:{field:field,value:key,page:page,count:size},
+            error:function (req) {
+                console.log(req.responseText);
+                layer.open({
+                   content:"查询结果失败"
+                   ,time:2
+                   ,skin:"msg"
+                });
+            },
+            success:function (data) {
+                if (data.count!=null) {
+                    count = data.count;
+                    $.each(data.data,function (index,item) {
+                        addExhibitsToDom(item);
+                    });
+                }
+            }
+        });
+        layer.closeAll();
+    }
+
+    function addExhibitsToDom(exhibit) {
+        var html='<div class="media" onclick="exhibitsDetail('+exhibit["id"]+');">' +
+            '            <div class="media-left media-middle">\n' +
+            '                <a href="javascript:void(0);">\n' +
+            '                    <img class="media-object exhibitImg" src="'+exhibit["mainPhotoPath"]+'">' +
+            '                </a>' +
+            '            </div>' +
+            '            <div class="media-body">\n' +
+            '                <h5 class="goodName media-heading">\n' +
+            exhibit["exhibitsName"] +
+            '                </h5>\n' +
+            '                <p class="price">'+exhibit["price"]+'</p>\n' +
+            '                <div class="text-muted ">\n' +
+            '                    <span>'+exhibit['exhibitorName']+'</span>\n' +
+            '                    <span style="color: #f4191c" class="glyphicon glyphicon-fire pull-right">'+exhibit["category"]+'</span>\n' +
+            '                </div>\n' +
+            '            </div>\n' +
+            '        </div>';
+
+        $("#exhibitList").append(html);
+    }
+
+    function exhibitsDetail(id) {
+        window.location.href = "exhibitsDetail.html?id=" + id;
+    }
+</script>
+</body>
+
+</html>

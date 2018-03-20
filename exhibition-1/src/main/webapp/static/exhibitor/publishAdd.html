@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <script type="text/javascript" src="../js/jquery.min.js"></script>
+    <script src="../layui/layui.js"></script>
+</head>
+<body>
+<form class="layui-form" action="#" id="uploadForm">
+    <div class="layui-form-item">
+        <label class="layui-form-label">展品数量</label>
+        <div class="layui-input-block">
+            <input type="text" name="number" lay-verify="required|number|inputNumber" autocomplete="off" placeholder="请输入展品数量"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">展品价格</label>
+        <div class="layui-input-block">
+            <input type="text" name="price" lay-verify="required|number|inputPrice" autocomplete="off" placeholder="请输入展品价格"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit lay-filter="sendFormBtn">立即提交</button>
+            <button type="reset" id="resetBtn" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<!--<form action="/exhibits/uploadPhoto">-->
+    <!--<div class="layui-upload" style="margin-left: 100px;">-->
+        <!--<button type="button" class="layui-btn" id="imageUpload">多图片上传</button>-->
+        <!--<blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;">-->
+            <!--预览图：-->
+            <!--<div class="layui-upload-list" id="demo2"></div>-->
+        <!--</blockquote>-->
+    <!--</div>-->
+<!--</form>-->
+</body>
+</html>
+<script src="../js/common.js"></script>
+<script>
+    layui.use(['upload','form','layer'], function () {
+        var upload = layui.upload;
+        var form = layui.form;
+        var layer = layui.layer;
+
+        //表单提交
+        form.on('submit(sendFormBtn)',function (data) {
+            var id = GetUrlParam('id');//展品id
+            console.log(decodeURI(id));
+            if (id==null || id=='') {
+                layer.msg("缺少展品id",{
+                    time:3000,
+                    icon:5
+                });
+                return false;
+            }
+
+            layer.msg('确定发布吗?',{
+                icon:3,
+                time:0,
+                btn:["确定","取消"],
+                yes:function (index) {
+                    layer.close(index);
+                    layer.load(1);
+                    $.ajax({
+                        url:getRootPath()+"/exhibitStore/releaseExhibits",
+                        method:'post',
+                        async:false,
+                        data:{id:id,number:data.field["number"],price:data.field['price']},
+                        error:function (request, textStatus, errorThrown) {
+                            layer.closeAll('loading');
+                            console.log('发布展品失败--错误信息如下:'+request.responseText);
+                            layer.msg("发布失败！\n错误信息在控制台中打印,请与管理员联系!",{
+                                icon:5,
+                                time:0,
+                                btn:['OK'],
+                                yes:function (index) {
+                                    layer.close(index);
+                                }
+                            });
+                        },
+                        success:function (data) {
+                            layer.closeAll('loading');
+                            if (data.status==0 || data.status=='0'){
+                                layer.msg(data.message,{
+                                    icon:5,
+                                    time:0,
+                                    btn:['OK'],
+                                    yes:function (index) {
+                                        layer.close(index);
+                                    }
+                                });
+                            }
+                            if (data.status==1 || data.status=='1') {
+                                layer.msg(data.message,{
+                                    icon:6,
+                                    time:0,
+                                    btn:['OK'],
+                                    yes:function (index) {
+                                        $("#resetBtn").click();
+                                        layer.close(index);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+            return false;
+        });
+
+        //多图片上传
+//        upload.render({
+//            elem: '#imageUpload'
+//            , url: '/upload/'
+//            //url: '/exhibits/uploadPhoto'
+//            , multiple: true
+//            , before: function (obj) {
+//                //预读本地文件示例，不支持ie8
+//                obj.preview(function (index, file, result) {
+//                    $('#demo2').append('<img src="' + result + '" alt="' + file.name + '" class="layui-upload-img">')
+//                });
+//            }
+//            , done: function (res) {
+//                //上传完毕
+//            }
+//        });
+
+        //表单验证
+        form.verify({
+            inputNumber:function (data,item) {
+                var value = parseInt(data);
+                if (value>10000000) {
+                    return '输入数目过大';
+                }
+            },
+            inputPrice:function (data,item) {
+                var value = parseInt(data);
+                if (value>100000000) {
+                    return '输入数目过大';
+                }
+            }
+        });
+    });
+</script>

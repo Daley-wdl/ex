@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>评论详情</title>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap3.3.7.min.css">
+    <style type="text/css">
+        header {
+            padding-top: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            font-size: large;
+        }
+        .comment{
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #cccccc;
+        }
+        .commentBody{
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<header id="header" class="container">
+    <div class="row">
+        <div><span onclick="back();" class="pull-left glyphicon glyphicon-chevron-left" style="padding-left: 5px;">返回</span></div>
+        <div align="center">
+            <strong>评论详情&emsp; &emsp; </strong>
+        </div>
+    </div>
+</header>
+
+<!--评价-->
+<div class="container" id="comments">
+</div>
+
+<div class="container" style="padding-top: 20px;">
+    <a id="nextBtn" href="javascript:void(0);" onclick="nextPage();" class="btn btn-default pull-right">下一页</a>
+    <a id="preBtn" href="javascript:void(0);" onclick="prePage();" class="btn btn-default">上一页</a>
+</div>
+
+<footer id="footer">
+
+</footer>
+
+<script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript">
+    var id = GetUrlParam("id");
+    var page = 1;
+    var size = 15;
+    var totalPage = 0;
+    $(function () {
+        init();
+    });
+
+    function prePage() {
+        if (page<=1) {
+            return false;
+        }
+        page--;
+        getComments();
+    }
+
+    function nextPage() {
+        if (page==totalPage) {
+            return false;
+        }
+        page++;
+        getComments();
+    }
+
+    function back() {
+        window.location.href = "exhibitsDetail.html?id=" + id;
+    }
+    
+    function init() {
+        getComments();
+    }
+    
+    function getComments() {
+        $.ajax({
+            url: getRootPath() + "/search/getComments"
+            , async: false
+            , data: {exhibitsId: id, page: page, size: size}
+            , error:function (req) {
+                console.log(req);
+                layer.open({
+                    content:'请求出现错误',
+                    skin:'msg',
+                    time:2
+                })
+            }
+            ,success:function (data) {
+                var count = data.count;
+                totalPage = Math.ceil(count / size);
+                console.log(totalPage+"\t"+page);
+                $("#preBtn").css("visibility", 'visible');
+                $("#nextBtn").css("visibility", 'visible');
+                if (totalPage==0) {
+                    //没有评论
+                    $("#preBtn").css("visibility", 'hidden');
+                    $("#nextBtn").css("visibility", 'hidden');
+                    $("#comments").html('<div align="center" style="padding-top: 20px;">暂时没有评论</div>');
+                }
+                if (page==1) {
+                    $("#preBtn").css("visibility", 'hidden');
+                }
+                if (page==totalPage) {
+                    $("#nextBtn").css("visibility", 'hidden');
+                }
+                $.each(data.data, function (index, itm) {
+                    addCommentToDom(itm);
+                });
+            }
+        });
+    }
+    
+    function addCommentToDom(comment) {
+        var html = '<div class="comment">' +
+            '        <div>' +
+            '            <small>' +
+            '                <span class="postTime pull-right text-muted">'+comment['commentDate']+'</span>' +
+            '                <span class="username text-muted">'+comment['username']+'</span>' +
+            '            </small>' +
+            '        </div>' +
+            '        <div class="media">' +
+            '            <div class="media-left media-middle">' +
+            '                <a href="#">' +
+            '                    <img class="media-object" src="'+comment['photoPath']+'">' +
+            '                </a>' +
+            '            </div>' +
+            '            <div class="media-body commentBody">' +
+            '<p>'+comment['commentContent']+'</p>' +
+            '                <div>' +
+            '                    <span style="color: #f4191c" class="glyphicon glyphicon-fire pull-right">'+comment['productGrade']+
+                                 '</span>' +
+            '                    <span></span>' +
+            '                </div>'+
+            '            </div>' +
+            '        </div>' +
+            '    </div>';
+        $("#comments").append(html);
+    }
+</script>
+</body>
+
+</html>

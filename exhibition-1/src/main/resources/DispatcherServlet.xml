@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:webflow-config="http://www.springframework.org/schema/webflow-config"
+	xsi:schemaLocation="http://www.springframework.org/schema/webflow-config http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.3.xsd
+		http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<!--
+		配置照片的存储路径和访问路径
+		在相关类中使用@value进行注入
+	-->
+	<context:property-placeholder ignore-unresolvable="true"
+								  location="classpath:photo_save_path.properties" />
+
+	<!--① 自动扫描com.com.it.show 包下的@Controller标注的类控制器类 -->
+ 	<context:component-scan base-package="com.exhibition.controller" />
+	
+	<!--② 启动Spring MVC的注解功能，完成请求和注解POJO的映射 -->
+	<mvc:annotation-driven />
+	
+	
+	<!--③ 对模型视图名称的解析，在请求时模型视图名称添加前后缀 -->
+	
+	<bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+		p:prefix="/WEB-INF/JSP/" p:suffix=".jsp" />
+	 
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+		p:defaultEncoding="UTF-8" />
+	 	
+	<bean id="messageSource"
+		class="org.springframework.context.support.ResourceBundleMessageSource"
+		p:basename="i18n/messages" />
+
+
+	<!-- 配置静态资源 -->
+	<!-- 设置不过滤内容，比如:css,jquery,img 等资源文件 -->  
+	<mvc:default-servlet-handler/>
+	
+	<!--④ Web异常解析处理 -->
+	<!--  <bean id="exceptionResolver"
+		class="">
+		<property name="defaultErrorView">
+			<value>fail</value>
+		</property>
+		<property name="exceptionMappings">
+			<props>
+				<prop key="java.lang.RuntimeException">fail</prop>
+			</props>
+		</property>
+	</bean>
+
+	-->
+
+</beans>

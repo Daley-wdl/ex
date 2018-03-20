@@ -1,0 +1,30 @@
+[ 
+	{ 
+		"ID":"1", 
+		"goodsname":"电脑", 
+		"username":"杨帅敏",
+		"phone":"13667221035",
+		"address":"湖北省武汉市"
+	}, 
+	{ 
+		"ID":"2", 
+		"goodsname":"电脑", 
+		"username":"杨帅敏",
+		"phone":"13667221035",
+		"address":"湖北省武汉市"
+	}, 
+	{ 
+		"ID":"3", 
+		"goodsname":"电脑", 
+		"username":"杨帅敏",
+		"phone":"13667221035",
+		"address":"湖北省武汉市"
+	}, 
+	{ 
+		"ID":"4", 
+		"goodsname":"电脑", 
+		"username":"杨帅敏",
+		"phone":"13667221035",
+		"address":"湖北省武汉市"
+	}
+] 

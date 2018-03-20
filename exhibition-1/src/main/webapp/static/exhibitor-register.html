@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>展商注册</title>
+    <link rel="stylesheet" href="layui/css/layui.css" media="all">
+    <!--<script src="js/jquery.min.js"></script>-->
+    <script src="http://apps.bdimg.com/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.form/4.2.1/jquery.form.js"></script>
+</head>
+<body>
+<div class="layui-container">
+    <form class="layui-form" action="#" id="registerForm" enctype="multipart/form-data">
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="username" required lay-verify="required|username|sensitiveWord" placeholder="请输入用户名"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="password" id="password" required lay-verify="required|password"
+                       placeholder="请输入密码"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">确认密码</label>
+            <div class="layui-input-block">
+                <input type="password" name="passwordAgain" required lay-verify="required|passwordAgain" placeholder="请确认密码"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">公司法人姓名</label>
+            <div class="layui-input-block">
+                <input type="text" name="realName" required lay-verify="required|realName" placeholder="请输入公司法人姓名"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">电话</label>
+            <div class="layui-input-block">
+                <input type="text" name="phone" required lay-verify="required|phone" placeholder="请输入电话号码"
+                       autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">邮箱</label>
+            <div class="layui-input-block">
+                <input type="text" name="email" required lay-verify="required|email" placeholder="请输入邮箱"
+                       autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">地址</label>
+            <div class="layui-input-block">
+                <input type="text" name="address" required lay-verify="required" placeholder="请输入公司地址"
+                       autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">展商简介</label>
+            <div class="layui-input-block">
+            <textarea name="intro" placeholder="请输入展商简介（1-200）" required lay-verify="required|intro|sensitiveWord"
+                      class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">上传营业执照图片</label>
+            <div class="layui-input-block">
+                <input type="file" id="file" lay-verify="required" required name="file">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="sendFilter">立即提交</button>
+                <button type="reset" id="resetBtn" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="layui/layui.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript">
+    layui.use(['layer', "form"], function () {
+        var layer = layui.layer;
+        var form = layui.form;
+
+        form.verify({
+            username: function (value, item) {//value：表单的值、item：表单的DOM对象
+                var len = value.length;
+                if (len > 50 || len < 3) {
+                    return "长度在3-30之间!";
+                }
+            },
+            realName: function (value, itm) {
+                var length = value.length;
+                if (length>40 || length<2) {
+                    return "长度在2-40之间";
+                }
+            },
+            sensitiveWord: function (value, item) {
+                var tmp = filter(value);
+                if (tmp.indexOf("*") != -1) {
+                    return '包含敏感字符!';
+                }
+                if (tmp.indexOf("<")!=-1) {
+                    return '包含不合法字符( < )!';
+                }
+            },
+            password: function (value) {
+                if (value.length > 12 || value.length < 6) {
+                    return '长度在6-12之间';
+                }
+            },
+            passwordAgain: function (value) {
+                var password = $("#password").val();
+                if (isEmpty(password))
+                    return "请先输入密码!";
+                if (password != value) {
+                    return "两次输入的密码不同";
+                }
+
+            },
+            intro: function (value) {
+                if (value.length > 200) {
+                    return '长度在1-200之间';
+                }
+            }
+        });
+
+        form.on("submit(sendFilter)", function (data) {
+            console.log("注册..");
+            layer.load(1);
+            $("#registerForm").ajaxSubmit({
+                type: 'post',
+                async:false,
+                url: getRootPath() + '/common/register/exhibitor',
+                dataType: "json", /*设置返回值类型为文本*/
+                beforeSubmit:function () {
+                    console.log("发送...");
+                },
+                success:function (data,status) {
+                    if (data.status==1){
+                        layer.msg(data.message,{
+                            icon:5,
+                            time:0,
+                            btn:["确定"],
+                            yes:function (index) {
+                                layer.close(index);
+                            }
+                        });
+                    } else if (data.status==0) {
+                        layer.msg("注册成功!请前往登录",{
+                           icon:6,
+                           time:0,
+                           btn:["登录","取消"],
+                           yes:function (index) {
+//                               window.location.href = getRootPath() + "/static/login.html";
+                               window.location.href = "login.html";
+                           }
+                        });
+                    } else {
+                        layer.msg(data.message);
+                    }
+                },
+                error:function (request) {
+                    console.log(request.responseText);
+                    layer.msg("发生错误，错误信息以打印到控制台，请检查网络!",{
+                        icon:5
+                        ,time:0,
+                        btn:["确定"],
+                        yes:function (index) {
+                            layer.close(index);
+                        }
+                    })
+                }
+            });
+            layer.closeAll('loading');
+            return false;
+        });
+
+    });
+</script>
+</body>
+</html>

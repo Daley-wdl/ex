@@ -1,0 +1,19 @@
+.exhibitor_photo{
+	width: 70px;
+	height: 70px;
+	border-radius: 5px;
+	overflow: hidden;
+}
+.pager{
+	width: 90%;
+	margin:  0 auto;
+	margin-top: 10px;
+}
+.z_search{
+width: 60%;
+margin-left: 17%;
+float: left;
+}
+form{
+	margin-top: 15px;
+}

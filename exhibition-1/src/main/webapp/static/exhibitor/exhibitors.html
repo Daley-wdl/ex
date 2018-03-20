@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>展商管理系统</title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <link rel="stylesheet" href="../css/exhibitor_manage.css"/>
+</head>
+<body>
+<!--
+    作者：2047226719@qq.com
+    时间：2017-10-25
+    描述：导航栏
+-->
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo">展商管理系统</div>
+
+        <ul class="layui-nav layui-layout-right">
+            <a class="layui-nav-item" onclick="quit();" href="javascript:void(0);" style="color: forestgreen">退出</a>
+        </ul>
+    </div>
+
+    <div class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                <li class="layui-nav-item layui-nav-itemed"><a class="info" href="javascript:;">我的信息</a></li>
+                <li class="layui-nav-item  ">
+                    <a href="javascript:;">产品管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;" class="info">上传展品</a></dd>
+                        <dd><a href="javascript:;" class="info">展品仓库</a></dd>
+                        <dd><a href="javascript:;" class="info">已发布展品</a></dd>
+                    </dl>
+                </li>
+                <li class="layui-nav-item "><a href="javascript:;" class="info">评论管理</a></li>
+
+                <li class="layui-nav-item">
+                    <a href="javascript:;">订单管理</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;" class="info">订单列表</a></dd>
+                        <dd><a href="javascript:;" class="info">已取消订单列表</a></dd>
+                    </dl>
+                </li>
+
+                <li class="layui-nav-item ">
+                    <a href="javascript:;">修改信息</a>
+                    <dl class="layui-nav-child">
+                        <dd><a href="javascript:;" class="info">基本信息</a></dd>
+                        <dd><a href="javascript:;" class="info">修改密码</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--
+        作者：2047226719@qq.com
+        时间：2017-10-25
+        描述：右主体
+    -->
+    <div class="layui-body ">
+        <!--
+            作者：2047226719@qq.com
+            时间：2017-10-20
+            描述：我的信息
+        -->
+        <div class="text" style="margin-top: 50px;">
+            <div class="embed-responsive">
+                <iframe class='embed-responsive-item' width="105%" height="100%" style="min-height: 800px;"
+                        src="exhibitor-showInfo.html" allowtransparency="true" allowfullscreen="true"
+                        allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+            </div>
+        </div>
+        <!--
+            作者：2047226719@qq.com
+            时间：2017-10-20
+            描述：增加展品
+        -->
+        <div class="text" style="margin-top: 50px;">
+            <div class="embed-responsive">
+                <iframe class='embed-responsive-item' width="105%" height="100%" style="min-height: 800px;"
+                        src="addgoods.html" allowtransparency="true" allowfullscreen="true"
+                        allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+            </div>
+        </div>
+        <!--
+            作者：2047226719@qq.com
+            时间：2017-10-25
+            描述：展品仓库
+        -->
+        <div class="text">
+            <div class="embed-responsive">
+                <iframe class='embed-responsive-item' width="105%" height="100%" style="min-height: 800px;"
+                        src="exhibitstore-list.html" allowtransparency="true" allowfullscreen="true"
+                        allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+            </div>
+        </div>
+        <!--
+            作者：2047226719@qq.com
+            时间：2017-10-25
+            描述：已发布展品
+        -->
+        <div class="text">
+            <div class="embed-responsive">
+                <iframe class='embed-responsive-item' width="105%" height="100%" style="min-height: 800px;"
+                        src="exhibits-list.html" allowtransparency="true" allowfullscreen="true"
+                        allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+            </div>
+        </div>
+
+        <!--
+            作者：2047226719@qq.com
+            时间：2017-10-20
+            描述：评论管理
+        -->
+        <div class="text" style="margin-top: 50px;">
+            <div class="embed-responsive">
+                <iframe class='embed-responsive-item' width="105%" height="100%" style="min-height: 800px;"
+                        src="commentPreview.html" allowtransparency="true" allowfullscreen="true"
+                        allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+            </div>
+        </div>
+        <!--
+            作者：2047226719@qq.com
+            时间：2017-10-25
+            描述：已完成订单
+        -->
+        <div class="text">
+            <div class="embed-responsive">
+                <iframe class='embed-responsive-item' width="105%" height="100%" style="min-height: 800px;"
+                        src="orderList.html" allowtransparency="true" allowfullscreen="true"
+                        allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+            </div>
+        </div>
+        <!--
+            作者：2047226719@qq.com
+            时间：2017-10-25
+            描述：未完成订单
+        -->
+        <div class="text">
+            <div class="embed-responsive">
+                <iframe class='embed-responsive-item' width="105%" height="100%" style="min-height: 800px;"
+                        src="orderCanceledList.html" allowtransparency="true" allowfullscreen="true"
+                        allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+            </div>
+        </div>
+        <!--
+            作者：2047226719@qq.com
+            时间：2017-10-20
+            描述：修改展商信息
+        -->
+        <div class="text" style="margin-top: 50px;">
+            <div class="embed-responsive">
+                <iframe class='embed-responsive-item' width="105%" height="100%" style="min-height: 800px;"
+                        src="exhibitor-editInfo.html" allowtransparency="true" allowfullscreen="true"
+                        allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+            </div>
+        </div>
+        <!--
+            作者：2047226719@qq.com
+            时间：2017-10-20
+            描述: 修改密码
+        -->
+        <div class="text" style="margin-top: 50px;">
+            <div class="embed-responsive">
+                <iframe class='embed-responsive-item' width="105%" height="100%" style="min-height: 800px;"
+                        src="repassword.html" allowtransparency="true" allowfullscreen="true"
+                        allowfullscreenInteractive="true" border="0" frameborder="0"></iframe>
+            </div>
+        </div>
+    </div>
+    <!--
+        作者：2047226719@qq.com
+        时间：2017-10-25
+        描述：底部固定区域
+    -->
+    <div class="layui-footer">
+        展商管理系统
+    </div>
+</div>
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script type="text/javascript" src="../layui/layui.all.js"></script>
+<script type="text/javascript" src="../js/exhibitor_manage.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript">
+    //退出登录
+    function quit() {
+        $.ajax({
+            type: "post",
+            url: getRootPath() + "/common/logout",
+            async: false,
+            complete: function (request, status) {
+                if (request.status == 200) {
+                    var responseText = request.responseText;
+                    var data = JSON.parse(responseText);
+                    if (data.status == 1) {
+                        window.location.href = getRootPath() + "/common/login";
+                    } else {
+                        if (data.message != null) {
+                            alert("请求失败:\n" + data.message);
+                        }
+                        window.location.href = getRootPath() + "/common/login";
+                    }
+                } else {
+                    alert("请求出现错误，请重新登录");
+                    window.location.href = getRootPath() + "/common/login";
+                }
+            }
+        });
+//        window.location.href = getRootPath() + "/";
+    }
+</script>
+</body>
+</html>

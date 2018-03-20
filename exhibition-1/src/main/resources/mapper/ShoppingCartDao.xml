@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.ShoppingCartDao">
+
+    <resultMap id="ShoppingCart" type="com.exhibition.po.ShoppingCart">
+        <id property="cartId" column="cart_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="exhibitsId" column="exhibits_id"/>
+        <result property="buyNumber" column="buy_number"/>
+        <result property="productAmount" column="product_amount"/>
+        <result property="exhibitsName" column="exhibits_name"/>
+        <result property="picImg" column="pic_img"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="ShoppingCart">
+        INSERT INTO shopping_cart
+        (user_id,buy_number,product_amount,exhibits_id,exhibits_name,create_time,pic_img)
+        VALUES
+        (#{userId},#{buyNumber},#{productAmount},#{exhibitsId},#{exhibitsName},#{createTime},#{picImg})
+    </insert>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM shopping_cart WHERE cart_id=#{value}
+    </delete>
+
+    <delete id="deletByBatch" parameterType="List">
+        DELETE FROM shopping_cart
+        WHERE cart_id
+        IN
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <update id="update">
+        UPDATE shopping_cart
+        <set>
+            <if test="userId!=null">
+                user_id=#{userId},
+            </if>
+            <if test="buyNumber!=null">
+                buy_number=#{buyNumber},
+            </if>
+            <if test="productAmount!=null">
+                product_amount=#{productAmount},
+            </if>
+            <if test="exhibitsId!=null">
+                exhibits_id=#{exhibitsId},
+            </if>
+            <if test="exhibitsName!=null">
+                exhibits_name=#{exhibitsName},
+            </if>
+            <if test="picImg!=null">
+                pic_img=#{picImg},
+            </if>
+            <if test="updateTime!=null">
+                update_time=#{updateTime},
+            </if>
+        </set>
+        WHERE cart_id=#{cartId}
+    </update>
+
+    <select id="getShoppingCartById" parameterType="int" resultType="ShoppingCart">
+        select * from shopping_cart
+        WHERE cart_id=#{value}
+    </select>
+
+    <select id="getShoppingCartList" parameterType="int" resultType="ShoppingCart">
+        select cart_id,buy_number,product_amount,exhibits_id,exhibits_name,create_time,update_time,pic_img
+        from shopping_cart
+        WHERE user_id=#{value} ORDER BY create_time DESC
+    </select>
+
+    <select id="getCount" parameterType="int" resultType="int">
+        select count(*) from shopping_cart cart where cart.user_id=#{value}
+    </select>
+
+    <select id="getShoppingCartByIds" parameterType="int" resultType="ShoppingCart">
+        select cart_id, user_id,buy_number,product_amount,exhibits_id,exhibits_name,create_time,update_time,pic_img
+        from shopping_cart
+        WHERE cart_id in
+        <foreach collection="array" index="index" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </select>
+
+    <select id="getShoppingCart" resultType="ShoppingCart">
+        select * from shopping_cart cart
+        where cart.user_id=#{userId} AND cart.exhibits_id=#{exhibitsId}
+    </select>
+
+</mapper>

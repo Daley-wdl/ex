@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>注册</title>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
+    <style type="text/css">
+        header {
+            padding-top: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            font-size: large;
+        }
+        #logo{
+            margin-top: 20px;
+        }
+        form{
+            margin-top: 10px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #cccccc;
+            padding-top: 20px;
+        }
+        form a{
+            cursor: default;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+
+<header id="header" class="container">
+    <div class="row">
+        <div><span class="pull-left glyphicon glyphicon-chevron-left" style="padding-left: 5px;">返回</span></div>
+        <div align="center">
+            <strong>注册&emsp; &emsp; </strong>
+        </div>
+    </div>
+
+    <img id="logo" src="../img/logo.png">
+</header>
+
+<div class="container">
+    <form class="form-horizontal" role="form">
+        <div class="form-group">
+            <label for="username" class="col-sm-2 control-label">用户名</label>
+            <div class="col-sm-10">
+                <input type="text" maxlength="20" class="form-control" id="username" placeholder="请输入用户名">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="password" class="col-sm-2 control-label">密码</label>
+            <div class="col-sm-10">
+                <input type="password" maxlength="12" class="form-control" id="password" placeholder="请输入密码">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="passwordVaild" class="col-sm-2 control-label">密码确认</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" id="passwordVaild" placeholder="请确认密码">
+            </div>
+        </div>
+        <div class="row">
+            <div class="" align="center">
+                <a onclick="register();" class="btn btn-primary btn-lg btn-block" style="margin-right: 20px;">注册</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="" align="center">
+                <a href="login.html" class="btn btn-default btn-lg btn-block" style="margin-right: 20px;">返回登陆</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>
+<script src="js/common.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script>
+    function register() {
+        var username = $("#username").val();
+        var password = $("#password").val();
+        var passwordVaild = $("#passwordVaild").val();
+        var passReg=/^[0-9A-Za-z]{6,12}$/;
+        if (username.length>20||username.length<3) {
+            layer.open({
+                content:'用户名长度在3-20之间',
+                time:2,
+                skin:'msg'
+            });
+            return false;
+        }
+        if (!passReg.test(password)) {
+            layer.open({
+                content:'密码长度在6-20之间,且只能输入字母和数字',
+                time:2,
+                skin:'msg'
+            });
+            return false;
+        }
+        if (password!=passwordVaild) {
+            layer.open({
+                content:'两次输入的密码不一致',
+                time:2,
+                skin:'msg'
+            });
+            return false;
+        }
+        if (!vaildStr(username)){
+            layer.open({
+                content:'包含敏感字符',
+                time:2,
+                skin:'msg'
+            });
+            return false;
+        }
+        layer.open({
+            type: 2
+            ,content: '加载中'
+        });
+        $.ajax({
+            url:getRootPath()+"/common/register/user"
+            ,type:'post'
+            ,async:false
+            ,data:{username:username,password:password}
+            ,error:function (req) {
+                console.log(req);
+                layer.closeAll();
+                layer.open({
+                    content:'出现错误'
+                    ,btn:["确定"]
+                });
+            }
+            ,success:function (data) {
+                layer.closeAll();
+                if(data.status==1||data.status==0) {
+                    layer.open({
+                        content:data.message
+                        ,time:2
+                        ,skin:'msg'
+                    });
+                }
+            }
+        });
+
+    }
+
+    function vaildStr(str) {
+        if (str.indexOf("*")!=-1) {
+            return false;
+        }
+        if (str.indexOf("%")!=-1) {
+            return false;
+        }
+        if (str.indexOf(".")!=-1) {
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

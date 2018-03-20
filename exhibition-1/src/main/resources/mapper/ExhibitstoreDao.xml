@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.ExhibitstoreDao">
+
+    <insert id="addExhibits" parameterType="exhibitstore"  useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO exhibitstore(category, exhibitor_id, exhibits_name, creat_time,intro, main_photo_path, status,number,price)
+        VALUES (#{category},#{exhibitorId},#{exhibitsName},#{creatTime},#{intro},#{mainPhotoPath},#{status},#{number},#{price})
+    </insert>
+
+    <delete id="deleteExhibits" parameterType="int">
+        DELETE FROM exhibitstore WHERE id=#{value}
+    </delete>
+
+    <delete id="deleteExhibitsByUserId" parameterType="int">
+        DELETE FROM exhibitstore WHERE exhibitor_id=#{value}
+    </delete>
+
+    <update id="updateExhibits" parameterType="exhibitstore">
+        UPDATE exhibitstore
+        <set>
+            <if test="category!=null">
+                category=#{category},
+            </if>
+            <if test="exhibitsName!=null">
+                exhibits_name=#{exhibitsName},
+            </if>
+            <if test="intro!=null">
+                intro=#{intro},
+            </if>
+            <if test="mainPhotoPath!=null">
+                main_photo_path=#{mainPhotoPath},
+            </if>
+            <if test="number!=null">
+                number=#{number},
+            </if>
+            <if test="price!=null">
+                price=#{price},
+            </if>
+            <if test="shipmentAmount!=null">
+                shipment_amount=#{shipmentAmount},
+            </if>
+            <if test="published!=null">
+                published=#{published},
+            </if>
+            <if test="status!=null">
+                status=#{status}
+            </if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <select id="getAllExhibitstore" resultType="exhibitstore">
+        select * from exhibitstore WHERE status=#{status}
+        limit #{start} ,#{size}
+    </select>
+
+    <select id="getExhibitstoreByExhibitorId" resultType="exhibitstore">
+        select * from exhibitstore WHERE exhibitor_id=#{exhibitorId}
+        limit #{start},#{size}
+    </select>
+
+    <select id="getExhibitstoresByName" resultType="exhibitstore">
+        select * from exhibitstore WHERE exhibits_name=#{exhibitstoreName}
+    </select>
+
+    <select id="searchExhibitstoresByName" resultType="exhibitstore">
+        select * from exhibitstore WHERE exhibits_name LIKE CONCAT('%',#{exhibitstoreName},'%')
+        limit #{start},#{size}
+    </select>
+
+    <select id="getCount" resultType="int">
+        select count(*) from exhibitstore
+    </select>
+
+    <select id="getCountByStatus" parameterType="string" resultType="int">
+        select count(*) from exhibitstore e  where e.status=#{value}
+    </select>
+
+    <select id="getCountByExhibitorId" resultType="int">
+        select count(*) from exhibitstore e WHERE e.exhibitor_id = #{VALUE }
+    </select>
+
+    <select id="getExhibitById" parameterType="int" resultType="exhibitstore">
+        select * from exhibitstore WHERE id = #{VALUE}
+    </select>
+
+
+</mapper>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css"/>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css"/>
+    <script src="http://apps.bdimg.com/libs/jquery/1.8.3/jquery.min.js"></script>
+    <!--<script src="../js/jquery.min.js"></script>-->
+    <title>评论展示</title>
+    <style>
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>评论详情<small id="exhibitsName"></small></h2>
+</div>
+<hr class="layui-bg-orange">
+<table class="layui-table" id="exhibitsTable" lay-filter="tableFilter"></table>
+
+<script src="../layui/layui.js"></script>
+<!--layui自定义模版-->
+<script type="text/html" id="commentPhoto">
+    {{#  if(d.photoPath != null) { }}
+    <a class="layui-btn layui-btn-normal"  lay-event="disPhoto">详情</a>
+    {{#  } }}
+    {{#  if(d.photoPath == null) { }}
+    暂无
+    {{#  } }}
+</script>
+<script type="text/html" id="reply">
+    <a class="layui-btn layui-btn-normal"  lay-event="reply">回复</a>
+</script>
+<script type="text/html" id="productGrade">
+    {{#  if(d.productGrade >= 4) { }}
+    <i class="layui-icon" style="color: #f4191c">&#xe756;{{d.productGrade}}</i>
+    {{#  } }}
+    {{#  if(d.productGrade>2 && d.productGrade<4 ){ }}
+    <i class="layui-icon" style="color: #f41e8c;">&#xe6c6;{{d.productGrade}}</i>
+    {{#  } }}
+    {{#  if(d.productGrade <= 2){ }}
+    <i class="layui-icon" style="">&#x1005;{{d.productGrade}}</i>
+    {{#  } }}
+</script>
+<script src="../js/common.js"></script>
+
+<script type="text/javascript">
+    exhibitsId = GetUrlParam('exhibitsId');
+    var exhibitsName = GetUrlParam(decodeURIComponent('exhibitsName'));
+    $("#exhibitsName").html(decodeURI(exhibitsName));
+
+    layui.use(['layer', 'table'], function () {
+        var layer = layui.layer;
+        var table = layui.table;
+//        $ = layer.$;
+
+        table.render({
+            elem: '#exhibitsTable' //指定原始表格元素选择器
+            , url: getRootPath() + '/comment/getCommentsByExhibitsId'
+            , where:{exhibitsId:exhibitsId}
+            , height: 'full-20'
+            , skin: 'row' //行边框风格
+            , even: true, //开启隔行背景
+            cols: [[//id,exhibitsName,category,mainPhotoPath,intro,creatTime
+                {field: 'id', title: 'ID', width: 100, sort: true},
+                {field: 'username', title: '用户名', width: 200},
+                {field: 'commentDate', title: '评论时间', width: 200},
+                {field: 'productGrade', title: '用户评分', width:200, templet: '#productGrade'},
+                {field: 'commentContent', title: '评论内容', width: 500,event:'disContent'},
+                {field: 'photoPath', title: '评论图片', width: 200, templet: '#commentPhoto'},
+                {field: 'reply', title: '查看回复', width: 200, templet: '#reply'}
+            ]],
+            page: true,
+            request: {
+                pageName: 'page' //页码的参数名称，默认：page
+                , limitName: 'size' //每页数据量的参数名，默认：limit
+            },
+            limit: 30,//每页默认显示数量
+            limits: [10, 20, 30, 40, 50]
+        });
+
+        //详情按钮点击事件
+        table.on('tool(tableFilter)',function (obj) {
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+
+            
+            if(layEvent === 'disPhoto'){
+                var photoPath = data.photoPath;
+//                layer.alert(photoPath);
+                $("#commentPhotoDisplay").attr('src',photoPath);
+                layer.open({
+                    type: 1,
+                    title: false,
+                    closeBtn: 0,
+                    area: '500px',
+                    skin: 'layui-layer-nobg', //没有背景色
+                    shadeClose: true,
+                    content: $('#commentPhotoDisplay'),
+                    end:function () {
+                        $("#commentPhotoDisplay").attr('src','');
+                    }
+                });
+            } else if (layEvent==='reply'){
+                var commentId = data.id;
+//                window.open("reply.html?commentId=" + commentId);
+                layer.open({
+                    type:2
+                    ,content:"reply.html?commentId=" + commentId
+                    ,area: ['800px', '700px']
+                });
+            }
+
+        });
+
+    });
+
+
+
+</script>
+</body>
+<img id="commentPhotoDisplay" style="width: 500px;">
+</html>

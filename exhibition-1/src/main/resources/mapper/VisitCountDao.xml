@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.VisitCountDao">
+    <insert id="insert" parameterType="VisitCount">
+        insert into visit_count (count,date, max_online_count) values (#{count},#{date},#{maxOnlineCount})
+    </insert>
+
+    <update id="update" parameterType="VisitCount">
+        UPDATE visit_count
+        <set>
+            <if test="#{count}!=null">
+                count=#{count},
+            </if>
+            <if test="#{maxOnlineCount}!=null">
+                max_online_count=#{maxOnlineCount}
+            </if>
+        </set>
+        WHERE date=#{date}
+    </update>
+
+    <select id="select" resultType="VisitCount">
+        select * from visit_count WHERE date=#{date}
+    </select>
+
+    <select id="selectList" resultType="VisitCount">
+        SELECT * from visit_count ORDER BY date
+        limit #{start},#{end}
+    </select>
+
+    <select id="selectTotalCount" resultType="int">
+        SELECT SUM(count) from visit_count
+    </select>
+</mapper>

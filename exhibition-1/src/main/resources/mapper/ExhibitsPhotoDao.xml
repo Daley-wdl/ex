@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.ExhibitsPhotoDao">
+
+
+    <insert id="add" parameterType="ExhibitsPhoto">
+        insert into exhibits_photo (exhibits_id, path, exhibitor_id)
+        values (#{exhibitsId},#{path},#{exhibitorId})
+    </insert>
+
+    <insert id="addBatch" parameterType="list">
+        insert into exhibits_photo (exhibits_id, path, exhibitor_id) values
+        <foreach collection="list" item="item" index="index" separator="," >
+            (#{item.exhibitsId},#{item.path},#{item.exhibitorId})
+        </foreach>
+    </insert>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM exhibits_photo WHERE id=#{value}
+    </delete>
+
+    <delete id="deleteByExhibitorId" parameterType="int">
+        DELETE FROM exhibits_photo WHERE exhibitor_id=#{value}
+    </delete>
+
+    <delete id="deleteByExhibitsId" parameterType="int">
+        DELETE FROM exhibits_photo WHERE exhibits_id=#{value}
+    </delete>
+
+    <!--查询时结果信息包含的基本字段-->
+    <sql id="SelectBaseItem">
+        id,path
+    </sql>
+
+    <select id="getPhotos" parameterType="int" resultType="ExhibitsPhoto">
+        select
+        <include refid="SelectBaseItem"/>
+        from exhibits_photo e
+        WHERE exhibits_id=#{value}
+    </select>
+
+    <select id="getExhibitsById" resultType="ExhibitsPhoto" parameterType="int">
+        SELECT * FROM exhibits_photo p
+        WHERE p.id=#{value}
+    </select>
+
+    <delete id="deletePhotosByExhibitsId" parameterType="int">
+        DELETE FROM exhibits_photo
+        WHERE exhibits_id=#{value}
+    </delete>
+
+    <delete id="deletePhotosByExhibitorId" parameterType="int">
+        DELETE FROM exhibits_photo
+        WHERE exhibitor_id=#{value}
+    </delete>
+</mapper>

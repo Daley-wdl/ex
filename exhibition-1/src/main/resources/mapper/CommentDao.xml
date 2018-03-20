@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.CommentDao">
+
+    <!-- 根据commentid查询 -->
+    <select id="queryCommentByCommentId" resultType="Comment">
+        SELECT id, comment_date, comment_content, product_id, user_id, status, product_grade, photo_path
+        FROM comment
+        WHERE id = #{value}
+    </select>
+
+    <!-- 组合条件查询 -->
+    <select id="queryCommentList" resultType="Comment">
+        SELECT id, comment_date, comment_content, product_id, user_id, status, product_grade, photo_path
+        FROM comment c
+       <where>
+           AND 1=1
+
+           <if test="comment!=null">
+               <if test="comment.commentDate!=null">
+                   AND c.comment_date LIKE CONCAT('%',#{comment.commentDate},'%')
+               </if>
+               <if test="comment.commentContent!=null">
+                   AND c.comment_content LIKE CONCAT('%',#{comment.commentContent},'%')
+               </if>
+           </if>
+
+       </where>
+
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 新增 -->
+    <insert id="insertComment" parameterType="Comment"  useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comment (comment_date, comment_content, product_id, user_id, status, product_grade, photo_path,order_item_id)
+        VALUES (#{commentDate}, #{commentContent}, #{productId}, #{userId}, #{status}, #{productGrade}, #{photoPath},#{orderItemId})
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="deleteComment">
+        DELETE FROM comment WHERE id = #{value}
+    </delete>
+
+    <!-- 修改 -->
+    <update id="updateComment" parameterType="Comment">
+        UPDATE comment
+        <set>
+            <if test="commentDate!=null">
+                comment_date = #{commentDate},
+            </if>
+            <if test="commentContent!=null">
+                comment_content = #{commentContent},
+            </if>
+            <if test="productId!=null">
+                product_id = #{productId},
+            </if>
+            <if test="userId!=null">
+                user_id = #{userId},
+            </if>
+            <if test="status!=null">
+                status = #{status},
+            </if>
+            <if test="productGrade!=null">
+                product_grade = #{productGrade},
+            </if>
+            <if test="photoPath!=null">
+                photo_path = #{photoPath}
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据展品id查询 -->
+    <select id="queryCommentListByProductId" resultType="Comment">
+        SELECT c.id, comment_date, comment_content, product_id, product_grade, photo_path,u.username as username
+        FROM comment c ,users u
+        WHERE c.product_id = #{productId} AND c.user_id=u.user_id
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 根据用户id查询 -->
+    <select id="queryCommentListByUserId" resultType="Comment">
+        SELECT id, comment_date, comment_content, product_id, user_id, status, product_grade, photo_path
+        FROM comment
+        WHERE user_id = #{userId}
+         LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 获取总数 -->
+    <select id="getCount" resultType="int">
+        SELECT COUNT(*) FROM comment
+    </select>
+
+    <select id="getCommentsByExhibitsId" resultType="Comment">
+        SELECT c.id,c.comment_date,c.comment_content,c.photo_path,c.product_grade,u.username
+        FROM comment c,users u
+        WHERE c.product_id=#{exhibitsId} AND c.user_id=u.user_id
+        limit #{start},#{size}
+    </select>
+
+    <select id="getCommentPreview" resultType="CommentPreview">
+        SELECT es.id as exhibitsId,es.exhibits_name,COUNT(*) as commentsNum ,TRUNCATE(avg(c.product_grade),1) as averageGrade ,MAX(c.comment_date) as lastPostTime
+        FROM comment c,exhibits es
+        WHERE es.exhibitor_id=#{exhibitorId} AND c.product_id=es.id
+        GROUP BY c.product_id
+        ORDER BY count(*)
+        limit #{start},#{size}
+    </select>
+
+    <select id="getCommentPreviewCount" parameterType="int" resultType="int">
+        SELECT COUNT(DISTINCT c.product_id) as count FROM comment c,exhibits e WHERE e.exhibitor_id=#{value} AND e.id=c.product_id
+    </select>
+
+    <select id="getCommentsCount" parameterType="int" resultType="int">
+        SELECT count(*) FROM comment
+        WHERE product_id=#{value}
+    </select>
+
+    <select id="getBestComment" parameterType="int" resultType="Comment">
+        select * from comment
+        WHERE product_id=#{value}
+        ORDER BY comment_date DESC ,product_grade DESC
+        limit 0,1
+    </select>
+
+    <select id="getAvgGrade" parameterType="int" resultType="float">
+        SELECT AVG(product_grade) FROM comment
+        WHERE product_id=#{value}
+    </select>
+
+    <select id="getCommentByOrderItemId" parameterType="int" resultType="Comment">
+        select * from comment
+        WHERE order_item_id=#{value}
+    </select>
+
+</mapper>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>登录</title>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
+    <style type="text/css">
+        header {
+            padding-top: 20px;
+            padding-bottom: 10px;
+            font-size: large;
+            border-bottom: 1px solid #ccc;
+        }
+        #logo{
+            margin-top: 20px;
+        }
+        form{
+            margin-top: 10px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #cccccc;
+            padding-top: 20px;
+        }
+        form a{
+            cursor: default;
+            margin-top: 10px;
+        }
+        #registerDiv{
+            padding-top: 20px;
+            padding-left: 10px;
+            cursor: default;
+        }
+    </style>
+</head>
+<body>
+
+<header id="header" class="container">
+    <div class="row">
+        <div><span onclick="backToIndex();" class="pull-left glyphicon glyphicon-chevron-left" style="padding-left: 5px;">返回</span></div>
+        <div align="center">
+            <strong>登录&emsp; &emsp; </strong>
+        </div>
+    </div>
+    
+    <img id="logo" src="../img/logo.png">
+</header>
+
+<div class="container">
+    <form class="form-horizontal" id="form" role="form">
+        <div class="form-group">
+            <label for="username" class="col-sm-2 control-label">用户名</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" name="username" id="username" placeholder="请输入用户名">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="password" class="col-sm-2 control-label">密码</label>
+            <div class="col-sm-10">
+                <input type="password" class="form-control" name="password" id="password" placeholder="请输入密码">
+            </div>
+        </div>
+        <div class="row">
+            <div class="" align="center">
+                <a onclick="login();" class="btn btn-primary btn-lg btn-block" style="margin-right: 20px;">登录</a>
+            </div>
+        </div>
+    </form>
+
+    <div id="registerDiv">
+        <a href="register.html"><span class="lead">免费注册</span></a>
+    </div>
+</div>
+
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript">
+    function login() {
+        layer.open({
+            content:'登录中'
+            ,type:2
+        });
+
+        $.ajax({
+            url:getRootPath()+"/common/doLogin/user",
+            type:'post',
+            async:false,
+            data:$("#form").serialize(),
+            error:function (req) {
+                console.log(req);
+                layer.closeAll();
+                layer.open({
+                    content:'出现错误'
+                    ,btn:['确定']
+                })
+            },
+            success:function (data) {
+                layer.closeAll();
+                if(data.status==0) {
+                    var urlParam = GetUrlParam("redirect");
+                    if (urlParam!=null&&urlParam!="") {
+                        window.location.href = urlParam + ".html";
+                    } else {
+                        window.location.href = "index.html";
+                    }
+                }
+                if (data.status==-1) {
+                    layer.open({
+                        content: data.message
+                        ,skin:'msg'
+                        ,time:2
+                    });
+                }
+            }
+        })
+    }
+
+    function backToIndex() {
+        window.location.href = "index.html";
+    }
+</script>
+</body>
+</html>

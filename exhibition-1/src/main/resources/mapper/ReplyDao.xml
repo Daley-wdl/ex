@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.ReplyDao">
+
+    <!-- 根据id查询 -->
+    <select id="queryReplyByReplyId" resultType="reply">
+        SELECT id, reply_date, reply_content, comment_id, exhibitor_id, user_id, status, product_id, photo_path
+        FROM reply
+        WHERE id = #{value}
+    </select>
+
+
+    <!-- 新增 -->
+    <insert id="insertReply" parameterType="Reply" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO reply(reply_date, reply_content, comment_id, exhibitor_id, user_id, photo_path)
+        VALUES (#{replyDate}, #{replyContent}, #{commentId}, #{exhibitorId}, #{userId}, #{photoPath})
+    </insert>
+
+    <!-- 删除 -->
+    <delete id="deleteReply">
+        DELETE FROM reply WHERE id = #{value}
+    </delete>
+
+    <!-- 更新 -->
+    <update id="updateReply" parameterType="Reply">
+        UPDATE reply
+        <set>
+            <if test="replyDate!=null">
+            reply_date = #{replyDate},
+            </if>
+            <if test="replyContent!=null">
+                reply_content = #{replyContent},
+            </if>
+            <if test="commentId!=null">
+                comment_id = #{commentId},
+            </if>
+            <if test="exhibitorId!=null">
+                exhibitor_id = #{exhibitorId},
+            </if>
+            <if test="userId!=null">
+                user_id = #{userId},
+            </if>
+            <if test="status!=null">
+                status = #{status},
+            </if>
+            <if test="productId!=null">
+                product_id = #{productId},
+            </if>
+            <if test="photoPath!=null">
+                photo_path = #{photoPath}
+            </if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 根据评论id查询 -->
+    <select id="queryReplyListByCommentId" resultType="Reply">
+        SELECT  id, reply_date, reply_content, exhibitor_id, user_id, status
+        FROM reply
+        WHERE comment_id = #{value} AND status in ('1')
+        ORDER BY reply_date
+    </select>
+
+    <!-- 根据展品id查询 -->
+    <select id="queryReplyListByProductId" resultType="Reply">
+        SELECT  id, reply_date, reply_content, comment_id, exhibitor_id, user_id, status, product_id, photo_path
+        FROM reply
+        WHERE product_id = #{productId}
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 根据展商id查询 -->
+    <select id="queryReplyListByExhibitorId" resultType="Reply">
+        SELECT  id, reply_date, reply_content, comment_id, exhibitor_id, user_id, status, product_id, photo_path
+        FROM reply
+        WHERE exhibitor_id = #{exhibitorId}
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 根据用户id查询 -->
+    <select id="queryReplyListByUserId" resultType="Reply">
+        SELECT  id, reply_date, reply_content, comment_id, exhibitor_id, user_id, status, product_id, photo_path
+        FROM reply
+        WHERE user_id = #{userId}
+        LIMIT #{start}, #{size}
+    </select>
+
+    <!-- 获取总数 -->
+    <select id="getCount" resultType="int">
+        SELECT COUNT(*) FROM reply
+    </select>
+
+    <select id="getCountByCommentId" parameterType="int" resultType="int">
+        SELECT COUNT(*) from reply
+        WHERE comment_id=#{value}
+    </select>
+
+</mapper>

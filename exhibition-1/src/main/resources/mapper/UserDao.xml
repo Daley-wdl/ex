@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.UserDao">
+
+    <resultMap id="user" type="com.exhibition.po.User">
+        <id property="userId" column="user_id"/>
+        <result property="username" column="username"/>
+        <result property="password" column="password"/>
+        <result property="salt" column="salt"/>
+        <result property="locked" column="locked"/>
+        <result property="creatTime" column="creat_time"/>
+        <collection property="roles" ofType="role">
+            <id property="roleId" column="role_id"/>
+            <result property="roleName" column="role_name"/>
+            <!-- 还有Permission属性 -->
+        </collection>
+
+    </resultMap>
+
+    <!--
+        删除用户信息(两个方法结合使用)
+    -->
+    <delete id="deleteUser">
+        DELETE FROM users WHERE user_id=#{value}
+    </delete>
+    <delete id="deleteUserToRole">
+        DELETE FROM user_role WHERE user_id=#{value}
+    </delete>
+
+    <select id="findUserByName" resultMap="user">
+        select u.user_id, username,password,salt,locked,creat_time,role_id ,role_name from users u ,user_role ur,roles r
+        where u.username = #{username} AND ur.user_id=u.user_id AND r.id=ur.role_id
+    </select>
+
+    <select id="findUserById" resultType="user">
+        select u.user_id, username,password,salt,locked,creat_time,role_id ,role_name from users u ,user_role ur,roles r
+        where u.user_id = #{value} AND ur.user_id=u.user_id AND r.id=ur.role_id
+    </select>
+
+    <select id="selectUserByName" resultType="user">
+        select u.* from users u,roles r,user_role ur
+        WHERE u.user_id=ur.user_id AND ur.role_id=r.id AND r.id=3 AND u.locked=#{status} AND u.username LIKE CONCAT('%',#{name},'%')
+        ORDER BY user_id limit #{start},#{size}
+</select>
+
+    <select id="selectUserByNameAndRole" resultType="user">
+        select u.* from users u,roles r,user_role ur
+        WHERE u.user_id=ur.user_id AND ur.role_id=r.id AND r.id=#{roleId} AND u.locked=#{status} AND u.username LIKE CONCAT('%',#{name},'%')
+        ORDER BY user_id limit #{start},#{size}
+    </select>
+
+    <update id="updateUser" parameterType="user">
+        UPDATE users
+        <set>
+            <if test="userId!=null">
+                user_id=#{userId},
+            </if>
+            <if test="username!=null">
+                username=#{username},
+            </if>
+            <if test="password!=null">
+                password=#{password},
+            </if>
+            <if test="salt!=null">
+                salt=#{salt}
+            </if>
+        </set>
+        WHERE user_id=#{userId}
+    </update>
+
+    <select id="getId" parameterType="string" resultType="int">
+        select user_id from users WHERE username=#{value}
+    </select>
+
+    <select id="getUsername" resultType="string" parameterType="int">
+        select username from users WHERE user_id=#{value}
+    </select>
+
+    <select id="getPermissionsName" resultType="string">
+        SELECT permission_name
+        FROM role_permission rp,permissions p
+        WHERE rp.role_id = #{value} AND p.id = rp.permission_id
+    </select>
+
+    <!-- 新郑用户，如果成功则返回1（插入条数）,并且将插入后的自增主键的值赋到传入的参数user中 -->
+    <!-- 如果插入失败的话，返回0，并且user中的id为null -->
+    <insert id="insertUser" parameterType="user"  useGeneratedKeys="true" keyProperty="userId">
+        INSERT  ignore into users(username,password,salt,creat_time)
+        VALUES (#{username} , #{password} ,#{salt},#{creatTime})
+    </insert>
+
+    <!--锁定/解锁 账号-->
+    <update id="lockUser">
+        UPDATE users SET locked = #{lock}
+        WHERE username = #{username}
+    </update>
+
+    <!--修改用户的角色-->
+    <update id="setRole" >
+        UPDATE user_role
+        <set>
+            role_id=#{roleId}
+        </set>
+        WHERE  user_id=#{userId}
+    </update>
+
+    <!--查询所有账号被锁定的用户信息-->
+    <select id="getLockedUser" resultType="exhibitor">
+        select u.user_id, username,password,salt,locked,creat_time,role_id ,role_name from users u ,user_role ur,roles r
+        where u.locked = 1 AND ur.user_id=u.user_id AND r.id=ur.role_id
+        ORDER BY u.user_id limit #{start},#{count}
+    </select>
+
+    <!--根据roleId查询用户-->
+    <select id="selectUserByRole" resultMap="user">
+        SELECT u.* FROM users u,user_role ur
+        WHERE u.user_id=ur.user_id AND ur.role_id=#{roleId}
+        ORDER BY u.user_id limit #{start},#{count}
+    </select>
+
+</mapper>

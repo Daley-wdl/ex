@@ -1,0 +1,136 @@
+@charset "utf-8";
+.all{
+	/*background-color: powderblue;*/
+	width: 1100px;
+	margin: auto;
+}
+
+.sousuo{
+	width: 572px;
+	height: 50px;
+	margin: 0 auto;
+	margin-top: 25px;
+	margin-right: -100px;
+}
+.search-top{
+	width: 572px;
+	height: 40px;
+}
+.search-keyword{
+	width: 440px;
+	height: 36px;
+	border: 2px solid #009688;
+	padding-left: 28px;
+	border-radius: 5px;
+	
+}
+.icon-sousuo{
+	color:darkgrey ;
+    margin-right: -27px;
+    position: relative;
+}
+input::-webkit-input-placeholder{
+    color: #CCCCCC;
+}
+.search-keyword:focus{
+	outline: none;
+}
+.search-btn{
+	width: 100px;
+	height: 40px;
+	background-color: #009688;
+	color: white;
+	font-weight: bold;
+	font-size:18px;
+	border: none;
+	float: right;
+	border-radius: 5px;
+}
+
+.layui-carousel{
+	margin-top: 93px;
+}
+.layui-collapse{
+	margin-top: 15px;
+}
+.layui-field-box{
+	width:235px;
+	height: 250px;
+	overflow: hidden;
+}
+.layui-field-box img{
+	width:230px;
+	height: 230px;
+	overflow: hidden;
+}
+/*轮播*/
+.marquee{
+	height:100px;
+	overflow:hidden;
+	line-height:22px;
+}
+
+/*推荐轮播*/
+.rollpic{
+	width: 1100px;
+	height: 260px;
+}
+.rollpic .prev,.rollpic .next{
+	display:block; 
+	height:38px; 
+	width:38px; 
+	cursor:pointer; 
+	float:left; 
+	background:url(../img/unslider-arrow.png) no-repeat 0 0; 
+	margin-top:116px;
+}
+.rollpic .prev{
+	background-position:0 0; 
+	margin-right:5px;
+}
+.rollpic .prev:hover{
+	background-position:0 -38px;
+}
+.rollpic .next{
+	background-position:0 -76px;
+	margin-left:5px;
+}
+.rollpic .next:hover{
+	background-position:0 -114px;
+}
+.rollpicshow{
+	float:left; 
+	border:solid 1px #CCCCCC;
+}
+.rollpicshow li{
+	padding:10px;
+}
+.rollpicshow li img{
+	width: 230px;
+	height: 230px;
+}
+.more{
+	font-size: 15px;
+	float: right;
+	color: #009688;
+	font-family: "微软雅黑";
+}
+.more:hover{
+	color: #05796F;
+	cursor: pointer;
+	text-decoration: underline;
+}
+/*页脚*/
+.footer{
+	border-top:1px solid #E8E8E8; 
+	margin-top: 15px;
+	padding:15px 0;
+	font-size:12px;
+	color:#999;
+	line-height:22px;
+	text-align:center;
+}
+.footer a:hover{
+	color:cornflowerblue;
+}
+	

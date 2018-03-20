@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache maxBytesLocalHeap="50m">
+
+    <diskStore path="java.io.tmpdir"/>
+
+    <!--<cache name="passwordRetryCache" eternal="false"-->
+    <!--timeToIdleSeconds="3600" timeToLiveSeconds="0" overflowToDisk="false"-->
+    <!--statistics="true">-->
+    <!--</cache>-->
+
+    <cache name="authorizationCache" eternal="false"
+           timeToIdleSeconds="3600" timeToLiveSeconds="0" overflowToDisk="false"
+           statistics="true">
+    </cache>
+
+    <cache name="authenticationCache" eternal="false"
+           timeToIdleSeconds="3600" timeToLiveSeconds="0" overflowToDisk="false"
+           statistics="true">
+    </cache>
+
+    <!--session缓存-->
+    <cache name="shiro-activeSessionCache" eternal="true"
+           timeToIdleSeconds="3600"
+           timeToLiveSeconds="0"
+           overflowToDisk="true">
+    </cache>
+
+    <!--timeToLiveSeconds:缓存自创建日期起至失效时的间隔时间-->
+    <!--timeToIdleSeconds:缓存创建以后，最后一次访问缓存的日期至失效之时的时间间隔-->
+    <defaultCache
+            maxElementsInMemory="1000"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="false"/>
+    <!-- 在输入密码时，记录输入错误的次数 -->
+    <!-- 登录记录缓存 锁定10分钟 -->
+    <cache name="passwordRetryCache"
+           maxElementsOnDisk="20000"
+           eternal="false"
+           timeToIdleSeconds="120"
+           timeToLiveSeconds="120"
+           overflowToDisk="true"/>
+
+</ehcache>

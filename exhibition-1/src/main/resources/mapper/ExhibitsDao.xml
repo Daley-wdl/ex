@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.ExhibitsDao">
+
+    <insert id="insertExhibits" parameterType="Exhibits">
+        insert into exhibits (id,exhibits_name, number, creat_time, price, intro,
+            main_photo_path, photo_path, status, exhibitor_id, category)
+        values (#{id},#{exhibitsName},#{number},#{creatTime},#{price},#{intro},#{mainPhotoPath},
+            #{photoPath},#{status},#{exhibitorId},#{category})
+    </insert>
+
+    <delete id="deleteExhibits">
+        DELETE FROM exhibits WHERE id=#{value}
+    </delete>
+
+    <update id="updateExhibits" parameterType="exhibits">
+        UPDATE exhibits
+        <set>
+            <if test="exhibitsName!=null">exhibits_name=#{exhibitsName},</if>
+            <if test="number!=null">number=#{number},</if>
+            <if test="creatTime!=null">creat_time=#{creatTime},</if>
+            <if test="price!=null">price=#{price},</if>
+            <if test="intro!=null">intro=#{intro},</if>
+            <if test="mainPhotoPath!=null">main_photo_path=#{mainPhotoPath},</if>
+            <if test="photoPath!=null">photo_path=#{photoPath},</if>
+            <if test="status!=null">status=#{status},</if>
+            <if test="category!=null">category=#{category}</if>
+            <if test="shipmentAmount!=null">shipment_amount=#{shipmentAmount}</if>
+        </set>
+        WHERE id=#{id}
+    </update>
+
+    <select id="queryExhibitsByName" resultType="exhibits">
+        select * from exhibits WHERE exhibits_name LIKE CONCAT('%',#{exhibitsName},'%')
+        limit #{start},#{size}
+    </select>
+
+    <select id="selectExhibitsByName" resultType="exhibits">
+        select * from exhibits
+        WHERE status=#{status} AND exhibits_name LIKE CONCAT('%',#{name},'%')
+        ORDER BY id limit #{start},#{size}
+    </select>
+
+    <select id="getExhibitsByName" parameterType="string" resultType="exhibits">
+        select * from exhibits WHERE exhibits_name = #{value}
+    </select>
+
+    <select id="getExhibitsById" resultType="exhibits">
+        select * from exhibits WHERE id=#{value}
+    </select>
+
+    <select id="getExhibits" resultType="exhibits">
+        select * from exhibits WHERE status=#{status}
+        ORDER BY creat_time limit #{start},#{size}
+    </select>
+
+    <select id="getExhibitsByExhibitorId" resultType="exhibits">
+        select * from exhibits WHERE exhibitor_id=#{exhibitorId}
+        limit #{start},#{size}
+    </select>
+
+    <select id="getCount" resultType="int">
+        select count(*) from exhibits
+    </select>
+
+    <select id="getCountByStatus" parameterType="string" resultType="int">
+        select count(*) from exhibits e  where e.status=#{value}
+    </select>
+
+    <select id="getCountByExhibitorId" resultType="int" parameterType="int">
+        select count(*) from exhibits e where e.exhibitor_id=#{value}
+    </select>
+
+    <update id="reduceExhibitsNumber">
+        UPDATE exhibits SET number=(
+          SELECT tmp.num FROM (SELECT number-#{buyNumber} as num FROM exhibits WHERE id=#{exhibitsId}) tmp
+        ) WHERE id=#{exhibitsId}
+    </update>
+
+    <update id="addExhibitsNumber">
+        UPDATE exhibits SET number=(
+          SELECT tmp.num FROM (SELECT number+#{buyNumber} as num FROM exhibits WHERE id=#{exhibitsId}) tmp
+        ) WHERE id=#{exhibitsId}
+    </update>
+
+    <update id="updateAvgGrade" parameterType="int">
+        UPDATE exhibits SET avg_grade=#{grade}
+        WHERE id=#{exhibitsId}
+    </update>
+</mapper>

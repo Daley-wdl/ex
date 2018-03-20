@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css"/>
+    <style type="text/css">
+        .replayItem {
+            margin-top: 20px;
+            border: 1px solid #ccc !important;
+            padding: 14px;
+            border-radius: 16px !important;
+        }
+    </style>
+</head>
+<body>
+<!--回复列表-->
+<div id="replayList" class="container">
+
+</div>
+
+<hr class="layui-bg-red" style="margin-top: 50px;">
+<div class="layui-container">
+    <form action="#" class="layui-form" style="margin-top: 50px;">
+        <div class="layui-form-item">
+            <label class="layui-form-label">回复评论</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" class="layui-textarea" required lay-verify="required|reply|sensitiveWord"
+                          name="replyContent" id="replyContent"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit="" lay-filter="sendBtn">立即提交</button>
+                <a href="javascript:void(0);" onclick="refreshBtn();" class="layui-btn layui-btn-primary">刷新</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript" src="../js/jquery.min.js"></script>
+<script src="../layui/layui.js"></script>
+<script src="../js/common.js"></script>
+<script type="text/javascript">
+    sum = 0;
+    commentId = GetUrlParam('commentId');
+    layui.use(['layer', 'form'], function () {
+        var layer = layui.layer;
+        var form = layui.form;
+
+        refreshReplys(commentId);
+
+        form.verify({
+            reply: function (value, item) {//value：表单的值、item：表单的DOM对象
+                if (isEmpty(value))
+                    return '输入不能为空!';
+                var len = value.length;
+                if (len > 300) {
+                    return "长度小于300!";
+                }
+            }, sensitiveWord: function (value, item) {
+                var tmp = filter(value);
+                if (tmp.indexOf("*") != -1) {
+                    return '包含敏感字符!';
+                }
+                if (tmp.indexOf("<") != -1) {
+                    return '包含不合法字符( < )!';
+                }
+            }
+        });
+
+        form.on("submit(sendBtn)", function (data) {
+            layer.load(1);
+            $.ajax({
+                url: getRootPath() + "/reply/addReply/exhibitor"
+                , type: "post"
+                , async: false
+                , data: {commentId: commentId, replyContent: data.field['replyContent']}
+                , error: function (request) {
+                    console.log(request.responseText);
+                    layer.closeAll('loading');
+                    layer.alert("发送失败，请重试!");
+                }
+                , success: function (data) {
+                    layer.closeAll('loading');
+                    if (data.status == -1) {
+                        layer.open({
+                            type: 0,
+                            title:"",
+                            closeBtn: 0,
+                            icon: 5,
+                            time: 0,
+                            content:'长时间未操作，请重新登录!',
+                            yes: function (index) {
+                                window.location.href = getRootPath() + "/static/login.html";
+                            }
+                        });
+                    } else if (data.status == 1) {
+                        console.log(data.message);
+                        $("#replyContent").val("");
+                        layer.msg(data.message);
+                        refreshReplys(commentId);
+                    } else {
+                        if (data.message!=null) {
+                            layer.msg(data.message);
+                        }
+                        layer.msg("回复失败，请重试！");
+                    }
+                }
+            });
+
+            return false;
+        });
+
+    });
+
+    function refreshReplys(id) {
+        layer.load(1);
+        $.ajax({
+            async: false
+            , url: getRootPath() + '/reply/getReplysByCommentId'
+            , type: 'get'
+            , data: {commentId: commentId}
+            , error: function (request) {
+                console.log(request.responseText);
+                layer.msg("Error");
+            }
+            , success: function (data) {
+                if (data.count == 0) {
+                    layer.alert("没有回复!")
+                } else {
+                    sum = data.count;
+                    //<div class="replayItem"><p class="text-info text-left replyText"></p></div>
+                    var html = "";
+                    var towards = "";
+                    var textStyle = "";
+                    $.each(data.list, function (index, item) {
+                        if (item["userId"] == null) {
+                            //展商回复
+                            towards = 'text-success text-right';
+                        } else {
+                            towards = 'text-info text-left';
+                        }
+                        html += '<div class="replayItem"><p class="' + towards + '">' + item["replyContent"] + '</p></div>';
+                    });
+                    $("#replayList").html(html);
+                }
+            }
+        });
+        layer.closeAll("loading");
+    }
+
+    function refreshBtn() {
+        refreshReplys(commentId);
+    }
+</script>
+</body>
+</html>

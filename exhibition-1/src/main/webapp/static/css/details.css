@@ -1,0 +1,125 @@
+@charset "utf-8";
+.content{
+	/*background: url(../img/002.jpg);*/
+	width: 100%;
+}
+.content1{
+	width: 1100px;
+	margin: auto;
+}
+.goodpic{
+	width: 650px;
+	height: 300px;
+	margin: 0 auto;
+	padding: 15px;
+	padding-bottom: 0px;
+}
+.goodxiangqing{
+	width: 560px;
+	height: 60px;
+	/*background: peachpuff;*/
+	margin-left: 240px;
+}
+.Hui-iconfont-jiangjia{
+	color: red;
+	font-weight: bold;
+}
+.Hui-iconfont-goods{
+	font-weight: bold;
+	font-size: 20px;
+	color: #009688;
+}
+.goodtitle{
+	font-weight: bold;
+	font-size: 18px;
+}
+.goodprice2{
+	height:30px;
+	width: 300px;
+	/*background: red;*/
+	font-size: 26px;
+	color: #009688;
+	margin-left: 20px;
+	margin-top: 10px;
+}
+.Hui-iconfont-order{
+	color: #009688;
+	font-size: 16px;
+}
+.goodprice3{
+	width: 570px;
+	height: 50px;
+}
+.yuexiaoliang{
+	float: right;
+	margin-right: 15px ;
+	margin-right: 100px;
+    margin-top: -22px;
+}
+.zhanyue{
+	width: 570px;
+	height: 20px;
+	/*background: palegoldenrod;*/
+	font-size: 16px;
+}
+.shangjia{
+	float: left;
+	margin-right: 50px;
+	margin-left: 50px;
+}
+.pingjia{
+	float: left;
+	margin-right: 50px;
+	
+}
+.zhanqu{
+	float: left;
+}
+.Hui-iconfont-huangguan{
+	font-size: 18px;
+	color: #009688;
+}
+.where{
+	height: 30px;
+    font-size: 20px;
+    width: 230px;
+    opacity: 10px;
+    opacity: 0.7;
+    border-radius: 24px;
+    background: #CCCCCC;
+    margin-top: 10px;
+    padding-left: 15px;
+    padding-top: 10px;
+    font-family: "楷体";
+    font-weight: bold;
+    float: left;
+    margin-left: 50px;
+}
+.shoucang{
+	height: 30px;
+    font-size: 20px;
+    width: 150px;
+    opacity: 10px;
+    opacity: 0.7;
+    border-radius: 24px;
+    background: #CCCCCC;
+    margin-top: 10px;
+    padding-left: 15px;
+    padding-top: 10px;
+    font-family: "楷体";
+    font-weight: bold;
+    float: right;
+    margin-right: 50px;
+}
+
+.Hui-iconfont-android,.Hui-iconfont-card2-kong,.Hui-iconfont-comment,.Hui-iconfont-kefu{
+	color: #009688;
+	font-size: 17px;
+	font-weight: normal;
+}
+.goodlianxi{
+/*	background: palegreen;*/
+	width: 570px;
+	height: 80px;
+}
+

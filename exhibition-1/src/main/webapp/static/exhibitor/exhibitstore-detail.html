@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css"/>
+    <!--<link rel="stylesheet" href="../css/bootstrap.min.css"/>-->
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css"/>
+    <title>展品详情</title>
+    <style>
+    </style>
+</head>
+<body>
+<div class="layui-container">
+    <form class="layui-form" action="#">
+        <div class="layui-form-item">
+            <label class="layui-form-label">展品名称</label>
+            <div class="layui-input-block">
+                <input type="text" id="exhibitsName" name="exhibitsName" lay-verify="required|exhibitsName|sensitiveWord" autocomplete="off" placeholder="请输入名称" class="layui-input canedit">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-inline">
+                <label class="layui-form-label">创建时间</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="creatTime" autocomplete="off" placeholder="不可编辑" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">类别</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="category"  name="category" lay-verify="required|sensitiveWord" placeholder="请输入类别" autocomplete="off" class="layui-input canedit">
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">数量</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="number"  name="number" lay-verify="required|number" placeholder="请输入库存" autocomplete="off" class="layui-input canedit">
+                </div>
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">封面</label>
+            <div class="layui-input-block">
+                <img id="photo" src="#" class="img-responsive">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">简介</label>
+            <div class="layui-input-block">
+                <textarea id="intro" placeholder="请输入内容" lay-verify="required|sensitiveWord|intro" class="layui-textarea" placeholder="请输入展品简介" name="intro canEdit"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="editExhibits">立即提交</button>
+                <button type="button" id="applyEditBtn" class="layui-btn layui-btn-primary">编辑</button>
+                <!--修改封面图片btn-->
+                <button type="button" class="layui-btn" id="updatePhoto">
+                    <i class="layui-icon">&#xe67c;</i>更新图片
+                </button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+
+<script src="../js/jquery.min.js"></script>
+<script src="../layui/layui.js"></script>
+<script src="../js/common.js"></script>
+<script type="text/javascript">
+    editable = false;
+    id = GetUrlParam('id');//展品id
+    layui.use(['layer', "form",'upload'], function (){
+        var layer = layui.layer;
+        var form = layui.form;
+        var upload = layui.upload;
+
+        //init
+        init(id);
+
+        //表单验证
+        form.verify({
+            exhibitsName:function (data) {
+                var filteredData = filter(data);
+                if (data!=filteredData) {
+                    return '包含敏感词汇!';
+                }
+                var length = data.length;
+                if (length<1||length>30) {
+                    return '长度为1-30之间';
+                }
+            },
+            sensitiveWord:function (value, item) {
+                var tmp = filter(value);
+                if (tmp.indexOf("*")!=-1) {
+                    return '包含不合法字符!';
+                }
+            },
+            category:function (data) {
+                var filteredData = filter(data);
+                if (data!=filteredData) {
+                    return '包含敏感词汇!';
+                }
+                var length = data.length;
+                if (length<1||length>10) {
+                    return '长度为1-10之间';
+                }
+            },
+            intro:function (data) {
+                var filteredData = filter(data);
+                if (data!=filteredData) {
+                    return '包含敏感词汇!';
+                }
+                var length = data.length;
+                if (length<1||length>200) {
+                    return '长度为1-200之间';
+                }
+            }
+        });
+
+        $("#applyEditBtn").click(function () {
+            editable = !editable;
+            if (editable) {
+//                $("input").val("");
+                $("input").attr("disabled",true);
+//                $(".canedit").attr("disabled",false);
+                $.each($(".canedit"),function (index,item) {
+                    $(item).attr("disabled",false);
+                })
+                layer.msg("您现在可以进行编辑");
+            } else {
+                $("input").attr("disabled",true);
+                $("text").attr("disabled",true);
+                layer.msg("退出编辑");
+            }
+        });
+        
+        //提交表单
+        form.on("submit(editExhibits)",function (data) {
+            if (!editable) {
+                layer.msg("请点击编辑并修改信息后在提交!");
+                return false;
+            }
+            var exhibitsName = data.field["exhibitsName"];
+            var intro = data.field["intro"];
+            var category = data.field["category"];
+            var number = data.field["number"];
+            $.ajax({
+                url:getRootPath()+"/exhibitStore/updateExhibitstore",
+                type:"post",
+                data:{id:id,exhibitsName:exhibitsName,intro:intro,category:category,number:number},
+                error:function (request, textStatus, errorThrown) {
+                    layer.closeAll('loading');
+                    console.log('发布展品失败--错误信息如下:'+request.responseText);
+                    layer.msg("发布失败！\n错误信息在控制台中打印,请与管理员联系!",{
+                        icon:5,
+                        time:0,
+                        btn:['OK'],
+                        yes:function (index) {
+                            layer.close(index);
+                        }
+                    });
+                },
+                success:function (data,status) {
+                    console.log('请求返回状态'+status);
+                    if (data.status!=1) {
+                        layer.msg("更新失败!\n"+data.message,{
+                            icon:5,
+                            time:0,
+                            btn:["OK"],
+                            yes:function (index) {
+                                layer.close(index);
+                            }
+                        })
+                    } else {
+                        layer.msg("更新成功!");
+                        init(id);
+                        editable = false;
+                    }
+                }
+            });
+
+            return false;
+        });
+
+        //更新封面图片
+        var uploadInst = upload.render({
+            elem: '#updatePhoto' //绑定元素
+            ,url: getRootPath()+'/exhibitStore/updateMainPhoto' //上传接口
+            ,data:{exhibitsId:id}
+            ,accept:"images"
+            ,field:"uploadPhoto"//设置上传文件的字段名
+            ,size:2048//最大2M
+            ,done: function(res){
+                //上传完毕回调
+//                console.log(res);
+//                init(id);
+//                var json = JSON.parse(res);
+                if (res.status==1) {
+                    layer.msg("修改成功!",{
+                        icon:6,
+                        time:0,
+                        btn:["确定"],
+                        yes:function (index) {
+                            layer.closeAll(index);
+                            location.reload();
+                        }
+                    });
+                } else {
+                    layer.msg("修改失败:\n" + res.message);
+                }
+
+            }
+            ,error: function(){
+                //请求异常回调
+                layer.msg("修改失败!",{
+                    icon:5
+                });
+            }
+        });
+    });
+
+    function init(id) {
+        $.ajax({
+            type:"get",
+            url:getRootPath()+"/exhibitStore/showDetial",
+            data:{id:id},
+            async:false,
+            error:function (request) {
+                console.log(request.responseText);
+                layer.msg("请求发生错误，返回信息已打印到控制台，请和管理员联系!");
+            },
+            success:function (data,status) {
+//                console.log("请求状态:" + status);
+//                console.log(data.code);
+                if (data.code!=1 || data.code!='1') {
+                    layer.msg("获取展品信息失败:\n" + data.message);
+                } else {
+                    $("#exhibitsName").val(data.data['exhibitsName']);
+                    $("#creatTime").val(data.data['creatTime']);
+                    $("#category").val(data.data['category']);
+                    $("#photo").attr("src",data.data['mainPhotoPath']);
+                    $("#intro").val(data.data['intro']);
+                    $("#number").val(data.data['number']);
+                    $("input").attr("disabled",true);
+                    $("text").attr("disabled",true);
+                }
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

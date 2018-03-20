@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="../layui/css/layui.css">
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
+    <!--<script type="text/javascript" src="../js/展商后台管理系统.js"></script>-->
+</head>
+<body>
+<form class="layui-form" action="">
+    <div class="layui-form-item">
+        <label class="layui-form-label">企业法人</label>
+        <div class="layui-input-block">
+            <input type="text" name="realName" id="realName" lay-verify="title" autocomplete="off" placeholder="请输入法人"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <div class="layui-inline">
+            <label class="layui-form-label">联系电话</label>
+            <div class="layui-input-inline">
+                <input type="tel" name="phone" id="phone" lay-verify="phone" autocomplete="off" class="layui-input">
+            </div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="email" id="email" lay-verify="title" autocomplete="off" placeholder="请输入邮箱"
+                   class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">营业执照号</label>
+        <div class="layui-input-block">
+            <img id="licensePhoto" class="img-responsive" style="width: 500px;" name="licensePhoto" src="#">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">介绍</label>
+        <div class="layui-input-block">
+            <input type="text" name="intro" id="intro" lay-verify="title" autocomplete="off" placeholder="请输入介绍"
+                   class="layui-input">
+        </div>
+    </div>
+
+    <!--页面提交表单(需要吗?)-->
+    <!--<div class="layui-upload" style="margin-left: 100px;">-->
+    <!--<button type="button" class="layui-btn" id="test1">上传营业执照</button>-->
+    <!--<div class="layui-upload-list">-->
+    <!--<img class="layui-upload-img" id="demo1">-->
+    <!--<p id="demoText"></p>-->
+    <!--</div>-->
+    <!--</div>-->
+
+
+    <!--<div class="layui-form-item">-->
+    <!--<div class="layui-input-block">-->
+    <!--<button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>-->
+    <!--<button type="reset" class="layui-btn layui-btn-primary">重置</button>-->
+    <!--</div>-->
+    <!--</div>-->
+</form>
+</body>
+<script src="../js/jquery.min.js"></script>
+<script src="../layui/layui.all.js"></script>
+<script src="../js/common.js"></script>
+<script type="text/javascript">
+
+    $(function () {
+        layui.use('layer', function () {
+            var layer = layui.layer;
+        });
+
+        layer.load(1);//加载层图标
+        $.ajax({
+            type: "get",
+            url: getRootPath() + "/exhibitor/exhibitorShow",
+//            beforeSend: function () {
+//                layer.load(1);//加载层图标
+//            },
+            error: function () {
+                layer.msg("请求失败!");
+                layer.closeAll("loading");
+            },
+            success: function (data) {
+                setData(data);
+                layer.closeAll("loading");
+            }
+        });
+        $.each($("input"),function (index,item) {
+            $(item).attr("disabled",true);
+        })
+    });
+
+    function setData(data) {
+        $("#realName").val(data.realName);
+        $("#email").val(data.email);
+        $("#phone").val(data.phone);
+        $("#intro").val(data.intro);
+        document.getElementById("licensePhoto").src = getRootPath()+data.licensePhoto;
+    }
+
+    //    layui.use('upload', function () {
+    //        var $ = layui.jquery
+    //            , upload = layui.upload;
+    //
+    //        //普通图片上传
+    //        var uploadInst = upload.render({
+    //            elem: '#test1'
+    //            , url: '/upload/'
+    //            , before: function (obj) {
+    //                //预读本地文件示例，不支持ie8
+    //                obj.preview(function (index, file, result) {
+    //                    $('#demo1').attr('src', result); //图片链接（base64）
+    //                });
+    //            }
+    //            , done: function (res) {
+    //                //如果上传失败
+    //                if (res.code > 0) {
+    //                    return layer.msg('上传失败');
+    //                }
+    //                //上传成功
+    //            }
+    //            , error: function () {
+    //                //演示失败状态，并实现重传
+    //                var demoText = $('#demoText');
+    //                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-mini demo-reload">重试</a>');
+    //                demoText.find('.demo-reload').on('click', function () {
+    //                    uploadInst.upload();
+    //                });
+    //            }
+    //        });
+    //
+    //    })
+</script>
+</html>

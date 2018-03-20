@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>展品详情</title>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap3.3.7.min.css">
+    <style type="text/css">
+        header {
+            padding-top: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            font-size: large;
+        }
+
+        .mainBody {
+            margin-top: 5px;
+            border: 1px solid #cccccc;
+        }
+
+        .title {
+            margin-top: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-color: papayawhip;
+        }
+
+        .title-icon {
+            color: #f4191c;
+            padding-right: 15px;
+        }
+
+        #exhibitsNameContainer {
+            padding-top: 20px;
+            padding-bottom: 10px;
+        }
+
+        #priceContainer {
+            padding-top: 10px;
+            padding-bottom: 20px;
+        }
+
+        #addCartForm {
+            padding: 10px 5px;
+        }
+
+        #numChanger {
+            /*padding-top: 5px;*/
+        }
+
+        #numChanger span {
+            padding: 5px;
+        }
+
+        #moreComments {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .buttomItem {
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<header id="header" class="container">
+    <div class="row">
+        <div><a href="index.html"><span class="pull-left glyphicon glyphicon-chevron-left" style="padding-left: 5px;">返回</span></a></div>
+        <div align="center">
+            <strong>展品详情&emsp; &emsp; </strong>
+        </div>
+    </div>
+</header>
+
+<div class="container mainBody" id="cartList">
+
+    <!--详情图片轮播-->
+    <div id="div-carousel" class="carousel slide" data-ride="carousel">
+        <!-- Indicators -->
+        <ol class="carousel-indicators" id="carousel-indicators">
+            <!--<li data-target="#div-carousel" data-slide-to="0" class="active"></li>-->
+            <!--<li data-target="#div-carousel" data-slide-to="1"></li>-->
+            <!--<li data-target="#div-carousel" data-slide-to="2"></li>-->
+        </ol>
+
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner" id="carousel-inner" role="listbox">
+            <!--<div class="item active">-->
+            <!--<img src="../img/coffee.jpg" alt="...">-->
+            <!--<div class="carousel-caption">-->
+            <!--test-->
+            <!--</div>-->
+            <!--</div>-->
+        </div>
+
+        <!-- Controls -->
+        <a class="left carousel-control" href="#div-carousel" role="button" data-slide="prev">
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="right carousel-control" href="#div-carousel" role="button" data-slide="next">
+            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+
+
+    <div id="exhibitsNameContainer">
+        <p class="lead" id="exhibitsName"></p>
+    </div>
+    <div id="introContainer">
+        <p class="text-muted" id="intro">
+        </p>
+    </div>
+
+    <div id="priceContainer">
+        <span class="pull-right">
+            价格:&emsp;￥<span id="price" style="padding-left: 5px;padding-right: 5px;color: #f4191c"></span>
+        </span>
+        <span id="productGrade" class="glyphicon glyphicon-fire " style="color: #f4191c"></span>
+        <p class="text-muted" style="padding-top: 10px;">
+            库存：<span id="remainingNumber" style="padding-left: 10px;"></span>
+        </p>
+    </div>
+</div>
+<!--添加购物车-->
+<div class="container">
+    <div class="row" id="addCartForm">
+        <div class="col-md-5 col-sm-5 col-xs-5" id="numChanger" align="center">
+            <span id="addNum" onclick="subNum();" class="glyphicon glyphicon-minus"></span>
+            <span id="buyNumberSpan">1</span>
+            <span id="subNum" onclick="addNum();" class="glyphicon glyphicon-plus"></span>
+        </div>
+        <div class="col-md-7 col-sm-7 col-xs-7">
+            <a onclick="addCart();" href="javascript:void(0);" class="btn btn-info pull-right" style="cursor: default;">加入购物车</a>
+        </div>
+    </div>
+</div>
+
+
+<div class="container">
+    <h4 class="title">
+        <span class="title-icon glyphicon glyphicon-heart"></span>
+        相关评价
+    </h4>
+    <div id="commentComtainer">
+        <div class="media">
+            <div class="media-left media-middle">
+                <a href="#">
+                    <img class="media-object" id="commentPhoto" src="../img/photo.jpg" alt="...">
+                </a>
+            </div>
+            <div class="media-body">
+                <p class="text-muted" id="commentText">
+                </p>
+                <div>
+                    <span id="commentDate" class="pull-right" style="padding-right: 10px;"></span>
+                    <span id="commentGrade" class="glyphicon glyphicon-fire" style="color: #f4191c;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="moreComments" align="center">
+        <a href="javascript:void(0);" onclick="moreComments();" class="btn btn-default">查看更多评价</a>
+    </div>
+</div>
+
+<footer id="footer">
+    <!--结算或保存-->
+    <div class="main_nav_bottom">
+        <nav class="navbar navbar-default navbar-fixed-bottom">
+            <div class="col-md-12 col-sm-12 col-xs-12 buttomItem" align="center">
+                <button onclick="goShop();" type="button" class="btn btn-primary btn-lg btn-block">进店</button>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 buttomItem" align="center" style="margin-bottom: 20px;">
+                <a href="shoppingCart.html" class="btn btn-default btn-lg btn-block">我的购物车</a>
+            </div>
+        </nav>
+    </div>
+</footer>
+
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script src="js/common.js"></script>
+<script src="js/exhibitsDetail.js"></script>
+</body>
+
+</html>

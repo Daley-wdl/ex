@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.OrderAddressDao">
+
+    <select id="getOrderAddressList" resultType="OrderAddress" parameterType="int">
+        SELECT * FROM order_address WHERE user_id=#{value}
+    </select>
+
+    <select id="getOrderAddress" resultType="OrderAddress" parameterType="int">
+        SELECT * FROM order_address WHERE order_address.address_id=#{value}
+    </select>
+
+    <select id="delete" resultType="int">
+       DELETE FROM order_address WHERE address_id=#{value}
+    </select>
+
+    <insert id="insert" parameterType="OrderAddress" useGeneratedKeys="true" keyProperty="addressId">
+        INSERT INTO order_address(user_id,user_name,user_phone,province_name,city_name,district_name,user_adress
+            ,user_zipcode,create_time,update_time)
+        VALUES (#{userId},#{userName},#{userPhone},#{provinceName},#{cityName},#{districtName},#{userAdress},#{userZipcode},#{createTime},#{updateTime})
+    </insert>
+
+    <update id="update" parameterType="OrderAddress">
+        UPDATE order_address
+        <set>
+            <if test="userName!=null">
+                user_name = #{userName},
+            </if>
+            <if test="userPhone!=null">
+                user_phone = #{userPhone},
+            </if>
+            <if test="provinceName!=null">
+                province_name = #{provinceName},
+            </if>
+            <if test="cityName!=null">
+                city_name = #{cityName},
+            </if>
+            <if test="districtName!=null">
+                district_name = #{districtName},
+            </if>
+            <if test="userAdress!=null">
+                user_adress = #{userAdress},
+            </if>
+            <if test="userZipcode!=null">
+                user_zipcode = #{userZipcode},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        WHERE order_id=#{orderId}
+    </update>
+
+    <select id="getUserName" resultType="string" parameterType="int">
+        select user_name from order_address
+        WHERE order_address.address_id=#{value}
+    </select>
+
+</mapper>

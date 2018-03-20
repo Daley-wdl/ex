@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../../layui/css/layui.css">
+	<link rel="stylesheet" href="../../bs/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../../css/common.css" />
+	<script type="text/javascript" src="../../js/jquery.js"></script>
+	<script src="../../js/common.js"></script>
+	<title>所有待审核的展商(完成)</title>
+	</head>
+	<body>
+		<div class="container-fluid">
+			  <input id="name" type="text"placeholder="搜索"class="layui-input z_search">
+			  <button id="search" class="layui-btn">立即搜索</button>
+		</div>
+
+			<div class="layui-btn-group demoTable">
+				<button class="layui-btn" data-type="getCheckData">通过选中记录</button>
+			</div>
+
+			<table class="layui-table" id="displayTable" lay-filter="tableFilter">
+			</table>
+
+			<script id="barDemo" type="text/html">
+				<a class="layui-btn layui-btn-primary layui-btn-xs" lay-event="detail">查看图片</a>
+				<!--<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>-->
+				<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">通过</a>
+			</script>
+
+	        <center>第<span id="page">1</span>页，共<span id="totalPage">1</span>页</center>
+
+<script src="../../layui/layui.js"></script>
+<script>
+$(document).ready(function(){
+//	checkExhibitorsList();
+});
+
+/**********************复选框**********************/
+layui.use(['layer', 'table','element'], function () {
+    var layer = layui.layer;
+    var table = layui.table;
+    var elememt = layui.element;
+
+    table.render({
+        elem: '#displayTable' //指定原始表格元素选择器
+        , url: getRootPath()+"/admin/listAllCheckingExhibitor"
+        , height: 'full-400'
+        , even: true, //开启隔行背景
+        cols: [[
+            {type: 'checkbox'},
+            {field: 'id', title: 'ID', width: 80, sort: true},
+            {field: 'realName', title: '姓名', width: 200},
+            {field: 'email', title: '邮箱', width: 100},
+            {field: 'phone', title: '手机号', width: 200, sort: true},
+            {field: 'licensePhoto', title: '图片', width: 200},
+            {field: 'intro', title: '个人详情', width: 80}, //发布
+            {fixed: 'right', width:178, align:'center', toolbar: '#barDemo'}
+        ]],
+        page: true,
+        request: {
+            pageName: 'page' //页码的参数名称，默认：page
+            , limitName: 'size' //每页数据量的参数名，默认：limit
+        },
+        limit: 30,//每页默认显示数量
+        limits: [10, 20, 30, 40, 50]
+    });
+
+    //监听工具条
+    table.on('tool(tableFilter)', function(obj){
+        var data = obj.data;
+        if(obj.event === 'detail'){
+//            layer.msg('ID：'+ data.id + ' 的查看操作');
+            layer.open({
+                type: 1
+                ,title: false //不显示标题栏
+                ,closeBtn: false
+                ,area: '300px;'
+                ,shade: 0.8
+                ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                ,btn: [ '确定']
+                ,btnAlign: 'c'
+                ,moveType: 0 //拖拽模式，0或者1
+                ,content: '<div style="padding: 10px;  ">' +
+							'<img  style="text-align:center;width:280px;height: 200px;" src=data["licensePhoto"]/>'+
+							'</div>'
+            });
+
+        } else if(obj.event === 'del'){
+            layer.confirm('是否通过？', function(index){
+                obj.del();
+                addExhibitors("["+JSON.stringify(data)+"]");
+                layer.close(index);
+            });
+        }
+    });
+
+    var $ = layui.$, active = {
+        getCheckData: function(){ //获取选中数据
+            var checkStatus = table.checkStatus('displayTable')
+                ,data = checkStatus.data;
+//                alert(JSON.stringify(table));
+            layer.confirm('真的通过么', function(index){
+                addExhibitors(JSON.stringify(data));
+                layer.close(index);
+            });
+        }
+
+    };
+
+    $('.demoTable .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+});
+
+/**********************复选框**********************/
+	
+	//通过展商审核
+	function addExhibitors(exhibitor) {
+	    $.ajax({
+		type:"GET", 
+		url:getRootPath()+"/admin/setExhibitorStatus",
+		data:{"exhibitor":exhibitor,status:1},
+		dataType:"json", 
+		success:function(data){
+		    if(data.status==-1){
+		        alert("长时间未操作，请刷新页面后重新登录");
+		        return;
+			}
+			alert(data.message);
+		},
+        error : function(error) {
+            alert(data.message);
+        }
+	});
+	}
+
+$("#search").click(function() {
+    var name=$("#name").val();
+
+    var layer = layui.layer;
+    var table = layui.table;
+    var elememt = layui.element;
+    table.render({
+        elem: '#displayTable' //指定原始表格元素选择器
+        , url: getRootPath()+"/admin/searchExhibitorByName?status=0&name="+name
+        , height: 'full-400'
+        , even: true, //开启隔行背景
+        cols: [[
+            {type: 'checkbox'},
+            {field: 'id', title: 'ID', width: 80, sort: true},
+            {field: 'realName', title: '姓名', width: 200},
+            {field: 'email', title: '邮箱', width: 100},
+            {field: 'phone', title: '手机号', width: 200, sort: true},
+            {field: 'licensePhoto', title: '图片', width: 200},
+            {field: 'intro', title: '个人详情', width: 80}, //发布
+            {fixed: 'right', width:178, align:'center', toolbar: '#barDemo'}
+        ]],
+        page: true,
+        request: {
+            pageName: 'page' //页码的参数名称，默认：page
+            , limitName: 'size' //每页数据量的参数名，默认：limit
+        },
+        limit: 30,//每页默认显示数量
+        limits: [10, 20, 30, 40, 50]
+    });
+});
+
+	</script>
+	</body>
+</html>

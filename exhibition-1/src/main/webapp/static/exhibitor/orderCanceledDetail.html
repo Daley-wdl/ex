@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>订单详情</title>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
+    <style type="text/css">
+        header {
+            padding: 10px;
+            border-bottom: 1px solid #cccccc;
+        }
+
+        .orderItemContainer {
+            margin-top: 20px;
+        }
+
+        .order {
+            /*margin-top: 20px;*/
+            padding-top: 10px;
+            padding-bottom: 10px;
+            /*border: 1px solid #cccccc;*/
+        }
+
+        .price {
+            border-right: 1px solid #cccccc;
+        }
+
+        .media {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border: 1px solid #cccccc;
+        }
+    </style>
+</head>
+<body>
+<header class="container">
+    <div>
+        <span class="pull-right">2017-12-20</span>
+        <span class="text-muted">订单号:<span id="orderId" style="padding-right: 10px;">12345678</span></span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="orderItemContainer">
+        <div class="order row">
+            <div id="orderItemList">
+                <!--<div class="media">-->
+                    <!--<div class="media-left media-middle">-->
+                        <!--<a href="#">-->
+                            <!--<img class="media-object" src="../img/photo.jpg">-->
+                        <!--</a>-->
+                    <!--</div>-->
+                    <!--<div class="media-body">-->
+                        <!--<p class="media-heading">Middle aligned media</p>-->
+                        <!--<div style="padding-top: 10px;">-->
+                            <!--<span class="pull-right">x<span-->
+                                    <!--style="padding-right: 10px;padding-left: 5px;">2</span></span>-->
+                            <!--<span style="color: #f4191c">￥<span style="padding-left: 10px;">50</span></span>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="http://apps.bdimg.com/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="../bs/js/bootstrap.min.js"></script>
+<script src="../js/common.js"></script>
+<script src="../js/layer_mobile/layer.js"></script>
+<script type="text/javascript">
+    $(function () {
+        var orderId = GetUrlParam("id");
+        init(orderId);
+    });
+
+    function init(id) {
+        var orderId = parseInt(id);
+
+        $("#orderId").html(id);
+        layer.open({
+            type: 2
+            , content: '加载中'
+        });
+        $.ajax({
+            url: getRootPath() + "/order/getCanceledOrderItemForExhibitor"
+            , data: {orderId: orderId}
+            , async: false
+            , error: function (req) {
+                console.log(req)
+                layer.closeAll();
+                layer.open({
+                    content: '加载失败，请重试'
+                    , btn: ["确定"]
+                    , shadeClose: false
+                    , yes: function (index) {
+                        layer.closeAll();
+                        window.close();
+                    }
+                });
+            }
+            , success: function (data) {
+                layer.closeAll();
+                if (data.status == -1) {
+                    layer.open({
+                        content: data.message
+                        , btn: ["确定"]
+                        , end: function () {
+                            layer.closeAll();
+                            window.close();
+                        }
+                    });
+                }
+                if (data.code == 0) {
+                    $("#totalPrice").html(data.message);
+                    $.each(data.data, function (index, item) {
+                        addOrderItemToDom(item);
+                    });
+                }
+                if (data.code == 1) {
+                    layer.open({
+                        content: data.message
+                        , shadeClose: false
+                        , btn: ["确定"]
+                        , yes: function () {
+                            layer.closeAll();
+                            window.close();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    function addOrderItemToDom(item) {
+        var html = '<div class="media">' +
+            '                    <div class="media-left media-middle">' +
+            '                        <a href="#">' +
+            '                            <img style="max-width: 100px;" class="media-object" src="'+item['picImg']+'">' +
+            '                        </a>' +
+            '                    </div>' +
+            '                    <div class="media-body">' +
+            '                        <p class="media-heading">'+item['exhibitsName']+'</p>' +
+            '                        <div style="padding-top: 10px;">' +
+            '                            <span class="pull-right">x<span' +
+            '                                    style="padding-right: 10px;padding-left: 5px;">'+item['buyNumber']+'</span></span>' +
+            '                            <span style="color: #f4191c">￥<span style="padding-left: 10px;">'+item['price']+'</span></span>' +
+            '                        </div>' +
+            '                    </div>' +
+            '                </div>';
+        $("#orderItemList").append(html);
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css"/>
+    <script src="http://apps.bdimg.com/libs/jquery/1.8.3/jquery.min.js"></script>
+    <!--<script src="../js/jquery.min.js"></script>-->
+    <title>订单列表</title>
+    <style>
+        #refreshBtn{
+            margin-top: 15px;
+            margin-left: 30px;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <a id="refreshBtn" href="javascript:void(0);" class="layui-btn layui-btn-primary" onclick="reloadPage();">刷新</a>
+</div>
+
+<!--<hr class="layui-bg-red">-->
+
+<!--显示商品列表-->
+<table class="layui-table" id="displayTable" lay-filter="tableFilter">
+</table>
+
+<script src="../layui/layui.js"></script>
+<script type="text/html" id="payType">
+    {{#  if(d.payType == 1){ }}
+    <i class="layui-icon">在线支付</i>
+    {{#  } }}
+    {{#  if(d.payType == 0){ }}
+    <i class="layui-icon" style="color: #1E9FFF;">线下支付</i>
+    {{#  } }}
+</script>
+<script type="text/html" id="sendType">
+    {{#  if(d.shipmentType == 3){ }}
+    <i class="layui-icon">自取</i>
+    {{#  } }}
+    {{#  if(d.shipmentType == 2){ }}
+    <i class="layui-icon">快递配送</i>
+    {{#  } }}
+    {{#  if(d.shipmentType == 1){ }}
+    <i class="layui-icon" style="color: #1E9FFF;">配送(免运费)</i>
+    {{#  } }}
+</script>
+<script type="text/html" id="orderStatus">
+    <i class="layui-icon" style="color: #1E9FFF;">已取消</i>
+</script>
+<script type="text/html" id="payment">
+    {{#  if(d.payment == 1){ }}
+    <i class="layui-icon">&#xe6af;已付款</i>
+    {{#  } }}
+    {{#  if(d.payment == 0){ }}
+    <i class="layui-icon" style="color: #1E9FFF;">&#xe69c;未付款</i>
+    {{#  } }}
+</script>
+
+<script type="text/html" id="detail">
+    <a href="javascript:void(0);" class="layui-btn layui-btn-normal" onclick="orderDetail('{{d.orderId}}')">
+        详情
+    </a>
+</script>
+
+<script src="../js/common.js"></script>
+
+<script type="text/javascript">
+    layui.use(['layer', 'table','element'], function () {
+        var layer = layui.layer;
+        var table = layui.table;
+        var elememt = layui.element;
+
+        table.render({
+            elem: '#displayTable' //指定原始表格元素选择器
+            , url: getRootPath() + '/order/getOrdersForExhibitor'
+            , height: 'full'
+            , skin: 'nob' //行边框风格
+            , even: true, //开启隔行背景
+            cols: [[//id,exhibitsName,category,mainPhotoPath,intro,creatTime
+                {field: 'orderId', title: '订单号', width: 100},
+                {field: 'username', title: '买家用户名', width: 150},
+                {field: 'payType', title: '支付方式', width: 150,templet:'#payType'},
+                {field: 'shipmentType', title: '配送方式', width: 150,templet:'#sendType'},
+                {field: 'shipmentAmount', title: '快递费', width: 100},
+                {field: 'orderStatus', title: '订单状态', width: 100,templet:'#orderStatus'},
+                {field: 'createTime', title: '创建时间', width: 100},
+                {field: 'updateTime', title: '更新时间', width: 100},
+                {field: 'payment', title: '已付款', width: 100, templet: '#payment'},
+                {field: 'id', title: 'more', width: 100, templet: '#detail'}//查看详情
+            ]],
+            page: true,
+            request: {
+                pageName: 'page' //页码的参数名称，默认：page
+                , limitName: 'size' //每页数据量的参数名，默认：limit
+            },
+            where:{canceled:true},
+            limit: 30,//每页默认显示数量
+            limits: [10, 20, 30, 40, 50]
+        });
+
+
+    });
+    function orderDetail(id) {
+        //查看订单详情
+        layer.open({
+            type: 2,
+            area: ['600px', '700px'],
+//            skin: 'layui-layer-molv',
+            title:'订单详情',
+//            skin: 'layui-layer-rim', //加上边框
+            content: 'orderCanceledDetail.html?id='+id
+        });
+    }
+
+    function reloadPage() {
+        location.reload();
+    }
+</script>
+</body>
+</html>

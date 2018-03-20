@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>我的购物车</title>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
+    <style type="text/css">
+        header {
+            padding-top: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+            font-size: large;
+        }
+        .cartItem {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border: 1px solid #ccc;
+        }
+        .media{
+            border-right: 1px solid #cccccc;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        .goodName {
+            margin-top: 10px;
+        }
+
+        .itemPrice {
+            color: #f4191c;
+            /*padding-top: 20px;*/
+        }
+        .exhibitImg{
+            max-width: 100px;
+        }
+        .counter {
+            border: 1px solid #b2b2b2;
+            border-radius: 4px;
+        }
+        .counter div{
+            padding-top: 5px;
+            padding-bottom: 5px;
+            cursor: default;
+        }
+        .buttomItem{
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+<header id="header" class="container">
+    <div class="row">
+        <div class="col-md-2 col-sm-2 col-xs-2">
+            <h4><a href="index.html">
+                <span class="pull-left glyphicon glyphicon-chevron-left" style="color: black"></span>
+            </a></h4>
+        </div>
+        <div class="col-md-10 col-sm-10 col-xs-10" align="center">
+            <h4>购物车<span class="glyphicon glyphicon-shopping-cart">5</span>&emsp;&emsp;</h4>
+            <!--&nbsp;&nbsp;&nbsp;&nbsp;-->
+        </div>
+    </div>
+</header>
+
+<div id="defaultDisplay">
+
+</div>
+
+<div class="container" id="cartList">
+
+</div>
+
+
+<footer id="footer">
+    <!--结算或保存-->
+    <div class="main_nav_bottom">
+        <nav class="navbar navbar-default navbar-fixed-bottom">
+            <div class="col-md-12 col-sm-12 col-xs-12 buttomItem " align="center">
+                <h4><span>总共:￥</span><span id="totalPrice" class="pull-right" style="color: #f4191c;"></span></h4>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 buttomItem" align="center">
+                <button id="deleteBtn" type="button" class="btn btn-default btn-lg btn-block">删除所选项</button>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12 buttomItem" align="center" style="margin-bottom: 20px;">
+                <button id="orderBtn" type="button" class="btn btn-primary btn-lg btn-block">生成订单</button>
+            </div>
+        </nav>
+    </div>
+</footer>
+
+<script src="https://cdn.bootcss.com/jquery/3.1.0/jquery.min.js"></script>
+<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript">
+$(function () {
+    getCarts();
+    reHeight();//调整高度
+    $("#orderBtn").click(function () {
+        var paramStr = "";
+        var carts = $('input[name="cart"]:checked');
+        if (carts==null||carts.length==0) {
+            layer.open({
+                content:'请先选择展品',
+                skin:'msg',
+                time:2
+            });
+            return false;
+        }
+        $.each(carts,function (index, item) {
+            paramStr += $(item).attr('value') + ";";
+        });
+        paramStr = paramStr.substr(0, paramStr.length - 1);
+        console.log(paramStr);
+        window.location.href = 'confirmOrder.html?idStr='+paramStr;
+    });
+    $("#deleteBtn").click(function () {
+        var idArray = new Array();
+        var carts = $('input[name="cart"]:checked');
+        $.each(carts,function (index, item) {
+            idArray[index] = $(item).attr('value');
+        });
+        deleteCarts(idArray);
+    });
+});
+
+function deleteCarts(idArray) {
+    if (idArray==null||idArray.length==0) {
+        return false;
+    }
+    $.ajax({
+        url: getRootPath() + "/shoppingCart/deleteShoppingCart"
+        , async: false
+        , data: {shoppingCartIds: idArray}
+        ,error:function (req) {
+            console.log(req);
+            layer.open("删除失败，请重试");
+        }
+        ,success:function (data) {
+            if (data.status==-1) {
+                //未登录
+                window.location, href = "login.html?redirect=shoppingCart";
+                return false;
+            }
+            if (data.message!=null){
+                layer.open({
+                    content:data.message
+                    ,skin:'msg'
+                    ,time:2
+                });
+            }
+            if (data.status==0) {
+                location.reload();
+            }
+
+        }
+    });
+}
+
+function reHeight() {
+    $.each($("#cartList").children(),function (index,item) {
+        var height = $(item).height();
+        var childrens = $(item).children();
+        var media = $(childrens.get(0));
+        var price = $(childrens.get(1));
+        var counter = $(childrens.get(2));
+        var mediaHeight = media.height();
+        var priceHeight = price.height();
+        var counterHeight = counter.height();
+        media.css("margin-top",(height-mediaHeight)/2+'px');
+        price.css("margin-top",(height-priceHeight)/2+'px');
+        counter.css("margin-top",(height-counterHeight)/2+'px');
+    });
+
+    var footerHeight = $(".buttomItem").height()*2+30+20+10;
+    $("#cartList").css("margin-bottom",footerHeight+10+'px');
+
+}
+
+function addItemToDom(exhibits) {
+    var productAmount = parseInt(exhibits['productAmount']);
+    var buyNumber = parseInt(exhibits['buyNumber']);
+    var singlePrice = Math.ceil(productAmount/buyNumber);
+    var html='<div class="row cartItem">' +
+        '        <div class="col-md-2 col-sm-2 col-xs-2" align="center">' +
+        '        <input value="'+exhibits['cartId']+'" type="checkbox" name="cart">' +
+        '        </div>' +
+        '        <div class="col-md-6 col-sm-6 col-xs-6" align="center">' +
+        '            <div class="media">' +
+        '                <div class="media-left media-middle">' +
+        '                    <a href="#">' +
+        '                        <img class="media-object exhibitImg" src="'+exhibits["picImg"]+'" />' +
+        '                    </a>' +
+        '                </div>' +
+        '                <div class="media-body" align="center">' +
+        '                    <strong>' +
+        '                        <p class="goodName media-heading">' +
+        exhibits['exhibitsName'] +
+        '                        </p>' +
+        '                    </strong>' +
+        '                </div>' +
+        '            </div>' +
+        '        </div>' +
+        '        <div class="col-md-2 col-sm-2 col-xs-2 itemPrice">' +
+        '            <strong>￥<span>'+singlePrice+'</span></strong>' +
+        '        </div>' +
+        '        <div class="col-md-2 col-sm-2 col-xs-2 counter" align="center">' +
+        '            <div onclick="addCartNum(this,'+exhibits['cartId']+','+singlePrice+');">+</div>' +
+        '            <div>'+exhibits['buyNumber']+'</div>' +
+        '            <div onclick="subCartNum(this,'+exhibits['cartId']+','+singlePrice+');">-</div>' +
+        '        </div>' +
+        '    </div>';
+    $("#cartList").append(html);
+}
+
+function addCartNum(item,id,singlePrice) {
+    var cartNum = $(item).next();
+    var num = cartNum.html();
+    if (num>10000) {
+        return false;
+    }
+    var numToUpdate = parseInt(num)+1;
+    updateNum(cartNum, id, numToUpdate);
+    cartNum.html(numToUpdate);
+    var oriPrice = parseInt($("#totalPrice").html());
+    $("#totalPrice").html(oriPrice + singlePrice);
+}
+
+function subCartNum(item,id,singlePrice) {
+    var cartNum = $(item).prev();
+    var num = cartNum.html();
+    if (num<=1) {
+        return false;
+    }
+    var numToUpdate = parseInt(num)-1;
+    updateNum(cartNum, id, numToUpdate);
+    cartNum.html(numToUpdate);
+    var oriPrice = parseInt($("#totalPrice").html());
+    $("#totalPrice").html(oriPrice - singlePrice);
+}
+
+function updateNum(numItem,id, num) {
+    $.ajax({
+        url: getRootPath() + "/shoppingCart/addNum"
+        , async: false
+        , data:{id:id,num:num}
+        , error:function (req) {
+            console.log(req);
+            layer.open({
+                content:'添加失败'
+                ,time:2
+                ,skin:'msg'
+            });
+        }
+        ,success:function (data) {
+            if (data.status==0) {
+                layer.open({
+                    content:data.message
+                    ,btn:['确定']
+                    ,shadeClose:false
+                    ,yes:function () {
+                        location.reload();
+                    }
+                });
+            }
+            if (data.status==1) {
+                //添加成功
+            }
+        }
+    });
+}
+
+function getCarts() {
+    layer.open({
+        type: 2
+        ,content: '加载中'
+    });
+    $.ajax({
+        url:getRootPath()+"/shoppingCart/getShoppingCartList"
+        ,async:false
+        ,error:function (req) {
+            layer.closeAll();
+            console.log(req);
+            layer.open({
+                content:'出现错误'
+                ,skin:'msg'
+                ,time:2
+            })
+        }
+        ,success:function (data) {
+            layer.closeAll();
+            if (data.code==1||data.status==-1) {
+                //未登录
+                window.location.href='login.html?redirect=shoppingCart';
+            }
+            if (data.code==0) {
+                var sum = 0;
+                if (data.count==0) {
+                    var html='<p style="padding: 20px;">您的购物车空空的哦~，去看看心仪的商品吧~</p>\n' +
+                        '    <p><a href="index.html" style="padding-left: 20px;">' +
+                        '<span class="glyphicon glyphicon-shopping-cart">去购物</span></a></p>';
+                    $("#defaultDisplay").html(html);
+                    $("#orderBtn").attr("disabled", true);
+                    $("#totalPrice").html(0);
+                } else {
+                    $.each(data.data,function (index,item) {
+                        addItemToDom(item);
+                        sum += parseInt(item['productAmount']);
+                    });
+                    $("#totalPrice").html(sum);
+                }
+            }
+        }
+    })
+}
+
+</script>
+</body>
+
+</html>

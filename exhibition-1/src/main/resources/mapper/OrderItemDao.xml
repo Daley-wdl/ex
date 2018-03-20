@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.OrderItemDao">
+
+    <insert id="insertByBatch" parameterType="List">
+        INSERT INTO `order_item`
+        (order_id, exhibits_id, exhibits_name, pic_img, price, buy_number, product_amount,comment_status)
+        VALUES
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.orderId},#{item.exhibitsId},#{item.exhibitsName},#{item.picImg},#{item.price}
+            ,#{item.buyNumber},#{item.productAmount},#{item.commentStatus})
+        </foreach>
+    </insert>
+
+    <insert id="insert" parameterType="OrderItem">
+        INSERT INTO `order_item`
+        (order_id, exhibits_id, exhibits_name, pic_img, price, buy_number, product_amount,comment_status)
+        VALUES (#{orderId}, #{logid},#{exhibitsName},#{picImg},#{price},#{buyNumber},#{productAmount},#{commentStatus})
+    </insert>
+
+    <delete id="deleteByBatch" parameterType="List">
+        DELETE FROM `order_item`
+        WHERE order_item.order_item_id
+        IN
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteByOrderId" parameterType="int">
+        DELETE FROM order_item WHERE order_id=#{value}
+    </delete>
+
+    <select id="getOrderItemList" parameterType="int" resultType="OrderItem">
+        select * from order_item WHERE order_id=#{value}
+    </select>
+
+    <select id="getOrderItemByExhibitorId" resultType="OrderItem">
+        SELECT * FROM order_item item ,`order` o,exhibits e
+        WHERE o.order_id=item.order_id AND e.id=item.exhibits_id
+          AND o.order_status=#{orderStatus} AND e.exhibitor_id=#{exhibitorId}
+        limit #{start},#{size}
+    </select>
+
+    <select id="getCountByExhibitorId" resultType="int">
+        SELECT COUNT(*) FROM order_item item ,`order` o,exhibits e
+        WHERE o.order_id=item.order_id AND e.id=item.exhibits_id
+          AND o.order_status=#{orderStatus} AND e.exhibitor_id=#{exhibitorId}
+    </select>
+
+    <update id="setShipmentId">
+        UPDATE order_item
+        SET shipment_id=#{shipmentId},shipment_time=#{shipmentTime}
+        WHERE order_item_id=#{orderItemId}
+
+    </update>
+
+    <select id="getOrderItemGroupByExhibitorId" resultType="OrderItem">
+        select
+        oi.order_id,oi.is_pay_off,oi.exhibits_id,oi.product_amount,oi.order_item_id,oi.shipment_time,oi.shipment_id
+        ,oi.comment_status,oi.pic_img,oi.exhibits_name,oi.is_pay_off,oi.buy_number,oi.price
+        from order_item oi ,exhibits e
+        WHERE oi.order_id=#{orderId} AND oi.exhibits_id=e.id AND e.exhibitor_id=#{exhibitorId}
+    </select>
+
+    <select id="getTotalPriceForExhibitor" parameterType="int" resultType="int">
+        select sum(oi.product_amount) from order_item oi, exhibits e
+        WHERE oi.order_id=#{orderId} AND oi.exhibits_id=e.id AND e.exhibitor_id=#{exhibitorId}
+    </select>
+
+    <update id="updateIsPayOffByExhibitor">
+        UPDATE order_item SET is_pay_off='1'
+        WHERE order_id=#{orderId}
+        AND exhibits_id IN
+        (SELECT tmp.exhibits_id FROM
+          (SELECT oi.exhibits_id FROM exhibits e,order_item oi WHERE exhibitor_id=#{exhibitorId} AND e.id=oi.exhibits_id)
+        tmp)
+    </update>
+
+    <update id="updateIsPayOffByOrder">
+        UPDATE order_item SET is_pay_off='1'
+        WHERE order_id=#{value}
+    </update>
+
+    <select id="getOrderItemListByOrderIds" parameterType="java.util.List" resultType="OrderItem">
+        select * from order_item
+        WHERE order_item.order_id IN
+        <foreach collection="list" separator="," open="(" close=")" item="item" index="index">
+            #{item}
+        </foreach>
+    </select>
+
+    <update id="updateCommentStatus">
+        UPDATE order_item
+        SET comment_status=#{status}
+        WHERE order_item_id=#{itemId}
+    </update>
+
+    <select id="getShipmentIdListByOrderId" parameterType="int" resultType="string">
+        select shipment_id from order_item WHERE order_id=#{value}
+    </select>
+
+</mapper>

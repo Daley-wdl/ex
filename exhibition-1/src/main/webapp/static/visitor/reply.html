@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="utf-8">
+    <title>回复</title>
+    <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.4/css/bootstrap.css">
+    <style type="text/css">
+        header {
+            padding-top: 20px;
+            padding-bottom: 10px;
+            font-size: large;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .replayItem {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            padding: 14px;
+            border-radius: 16px;
+        }
+        #replayList {
+            padding-bottom: 20px;
+            border-bottom: 1px solid #cccccc;
+        }
+    </style>
+</head>
+<body>
+
+<header id="header" class="container">
+    <div class="row">
+        <div><span onclick="window.location.href='user.html';" class="pull-left glyphicon glyphicon-chevron-left"
+                   style="padding-left: 5px;">返回</span></div>
+        <div align="center">
+            <strong>回复详情&emsp; &emsp; </strong>
+        </div>
+    </div>
+</header>
+
+<!--回复列表-->
+<div id="replayList" class="container">
+    <!--<div class="replayItem"><p class="text-success text-right">评价评价评价评价评价评价评价。。。</p></div>-->
+    <!--<div class="replayItem"><p class="text-info text-left">评价评价评价评价评价评价评价。。。</p></div>-->
+    <!--<div class="replayItem"><p class="text-success text-right"></p></div>-->
+</div>
+
+<form role="form">
+    <div class="form-group">
+        <label for="replyText">文本框</label>
+        <textarea class="form-control" id="replyText" rows="3"></textarea>
+    </div>
+    <div align="right">
+        <a class="btn btn-default btn-lg" href="javascript:void(0);" onclick="refreshBtn();">刷新</a>
+        <a onclick="sendReply();" class="btn btn-primary btn-lg" href="#" style="margin-right: 20px;">发送</a>
+    </div>
+</form>
+
+
+<script src="../js/jquery-3.1.0.js"></script>
+<script src="bootstrap/js/bootstrap3.3.7.min.js"></script>
+<script src="layer_mobile/layer.js"></script>
+<script src="js/common.js"></script>
+<script type="text/javascript">
+    sum = 0;
+    orderItemId = GetUrlParam('orderItemId');
+
+    $(function () {
+        init();
+    });
+
+    function init() {
+        if (orderItemId == null) {
+            window.location.href = "user.html";
+            return false;
+        }
+        refreshReplys(orderItemId)
+    }
+
+    function sendReply() {
+        layer.open({type: 2});
+        var reply = $("#replyText").val();
+        $.ajax({
+            url: getRootPath() + '/reply/addReply/user'
+            , data: {replyContent: reply, orderItemId: orderItemId}
+            , async: false
+            , error: function (req) {
+                console.log(req);
+                layer.closeAll();
+                layer.open({content: "请求失败，请检查网络"});
+            }
+            , success: function (data) {
+                layer.closeAll();
+                if (data.status == -1) {
+                    window.location.href = "login.html?redirect=user";
+                    return false;
+                }
+                if (data.status == 1) {
+                    $("#replyContent").val("");
+                    layer.open({
+                        content: data.message
+                        , skin: 'msg'
+                        , time: 2
+                    });
+                    refreshReplys(orderItemId);
+                }
+                if (data.status == 0) {
+                    layer.open({content: data.message});
+                }
+            }
+        });
+    }
+
+    function refreshReplys(id) {
+//        layer.open({
+//            type: 2
+//        });
+        $.ajax({
+            async: false
+            , url: getRootPath() + '/reply/getReplysByOrderItemId'
+            , type: 'get'
+            , data: {orderItemId: id}
+            , error: function (request) {
+                console.log(request.responseText);
+                layer.open({content:'获取回复失败，请重试'});
+            }
+            , success: function (data) {
+                if (data.status == -1) {
+                    window.location.href = "login.html";
+                } else {
+                    var html = "";
+                    var towards = "";
+                    var textStyle = "";
+                    $.each(data, function (index, item) {
+                        if (item["userId"] != null) {
+                            //展商回复
+                            towards = 'text-success text-right';
+                        } else {
+                            towards = 'text-info text-left';
+                        }
+                        html += '<div class="replayItem"><p class="' + towards + '">' + item["replyContent"] + '</p></div>'
+                    });
+                    console.log(html);
+                    $("#replayList").html(html);
+                }
+            }
+        });
+        layer.closeAll();
+    }
+
+    function refreshBtn() {
+        refreshReplys(orderItemId);
+    }
+</script>
+</body>
+</html>

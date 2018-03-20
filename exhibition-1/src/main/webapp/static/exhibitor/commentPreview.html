@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css"/>
+    <script src="http://apps.bdimg.com/libs/jquery/1.8.3/jquery.min.js"></script>
+    <!--<script src="../js/jquery.min.js"></script>-->
+    <title>评论展示</title>
+    <style>
+
+    </style>
+</head>
+<body>
+<!--评论管理-->
+<form action="#">
+    <div class="layui-form-item">
+        <label class="layui-form-label">产品ID</label>
+
+        <div class="layui-input-inline">
+            <input type="text" name="title" required lay-verify="required" placeholder="请输入产品ID" autocomplete="off"
+                   class="layui-input">
+        </div>
+        <button class="layui-btn" id="button2">查询</button>
+
+    </div>
+</form>
+<table class="layui-table" id="exhibitsTable" lay-filter="tableFilter">
+
+</table>
+
+
+<script src="../layui/layui.js"></script>
+<!--layui自定义模版-->
+<script type="text/html" id="commentDetail">
+    <a name="{{d.exhibitsId}}" class="layui-btn"  lay-event="detail">详情</a>
+</script>
+<script type="text/html" id="averageGrade">
+    {{#  if(d.averageGrade >= 4) { }}
+    <i class="layui-icon" style="color: #f4191c">&#xe756;{{d.averageGrade}}</i>
+    {{#  } }}
+    {{#  if(d.averageGrade>2 && d.averageGrade<4 ){ }}
+    <i class="layui-icon" style="color: #f41e8c;">&#xe6c6;{{d.averageGrade}}</i>
+    {{#  } }}
+    {{#  if(d.averageGrade <= 2){ }}
+    <i class="layui-icon" style="">&#x1005;{{d.averageGrade}}</i>
+    {{#  } }}
+</script>
+<script src="../js/common.js"></script>
+
+<script type="text/javascript">
+
+    layui.use(['layer', 'table'], function () {
+        var layer = layui.layer;
+        var table = layui.table;
+//        $ = layer.$;
+
+        table.render({
+            elem: '#exhibitsTable' //指定原始表格元素选择器
+            , url: getRootPath() + '/comment/getCommentsPreview'
+            , height: 'full-50'
+            , skin: 'row' //行边框风格
+            , even: true, //开启隔行背景
+            cols: [[//id,exhibitsName,category,mainPhotoPath,intro,creatTime
+                {field: 'exhibitsId', title: 'ID', width: 100, sort: true},
+                {field: 'exhibitsName', title: '展品名', width: 200},
+                {field: 'commentsNum', title: '评论数量', width: 200},
+                {field: 'lastPostTime', title: '最新评论时间', width: 200},
+                {field: 'id', title: '平均得分', width:100, templet: '#averageGrade'},//查看详情
+                {field: 'id', title: '查看详情', width: 200, templet: '#commentDetail'}//编辑图片
+            ]],
+            page: true,
+            request: {
+                pageName: 'page' //页码的参数名称，默认：page
+                , limitName: 'size' //每页数据量的参数名，默认：limit
+            },
+            limit: 30,//每页默认显示数量
+            limits: [10, 20, 30, 40, 50]
+        });
+
+        //详情按钮点击事件
+        table.on('tool(tableFilter)',function (obj) {
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+
+            if(layEvent === 'detail'){
+                var id = data.exhibitsId;
+                var exhibitsName = data.exhibitsName;
+                window.open("commentDetails.html?exhibitsId=" + id + "&exhibitsName=" + exhibitsName);
+            }
+        });
+
+    });
+
+    //回复
+    function replay() {
+        layui.use('layer', function () {
+            var layer = layui.layer;
+
+            layer.open({
+                area: ['500px', '300px'],
+                type: 2,
+                content: 'replay.html' //这里content是一个页面
+            });
+        });
+    }
+
+    //删除评论
+    function deletGoods() {
+        $.ajax({
+            type: "GET",
+            url: "json/index1.json",
+            //url:"http://1l8u025289.iok.la:19961/exhibition/comment/deleteComment?commentId"
+            //请求参数Id
+            dataType: "json",
+            success: function (data) {
+                $.each(data, function (i, result) {
+                    if (id == result["ID"])
+                        alert("删除");
+                    //此时修改该条记录该条记录~~~~~~
+                });
+            },
+            error: function (error) {
+                alert(error);
+            }
+        });
+    }
+
+</script>
+</body>
+</html>

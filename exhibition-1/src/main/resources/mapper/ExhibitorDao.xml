@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.ExhibitiorDao">
+
+    <!--
+        新增展商记录，并且将id设置到传入的对象中
+        如果插入成功则返回1，否则返回0
+    -->
+    <insert id="insertExhibitor" parameterType="exhibitor" useGeneratedKeys="true" keyProperty="id">
+        insert ignore into exhibitor (user_id,real_name,email,phone,license_photo,intro)
+        values (#{userId},#{realName},#{email},#{phone},#{licensePhoto},#{intro})
+    </insert>
+
+    <!--根据userId查询展商信息-->
+    <select id="selectByUserId" resultType="exhibitor">
+        select id,real_name,status,email,phone,license_photo,intro from exhibitor
+        WHERE user_id=#{value}
+    </select>
+
+    <select id="selectAllExhibitor" resultType="exhibitor">
+        select id,user_id,real_name,status,email,phone,license_photo,intro from exhibitor
+        WHERE status=#{status}
+        ORDER BY id limit #{start},#{size}
+    </select>
+
+    <select id="selectExhibitorByName" resultType="exhibitor">
+        select id,user_id,real_name,status,email,phone,license_photo,intro from exhibitor
+        WHERE status=#{status} AND real_name LIKE CONCAT('%',#{name},'%')
+        ORDER BY id limit #{start},#{size}
+    </select>
+
+    <!--根据用户搜索展商信息（模糊查询）-->
+    <select id="searchByName" resultType="exhibitor">
+        select e.id ,real_name,status,email,phone,license_photo,intro from users u ,exhibitor e
+         WHERE u.user_id=e.user_id AND u.username LIKE CONCAT('%',#{username},'%')
+    </select>
+
+    <!--更新展商信息-->
+    <update id="updateExhibitor" parameterType="exhibitor">
+        UPDATE exhibitor
+        <set>
+            <if test="realName!=null">
+                real_name=#{realName},
+            </if>
+            <if test="status!=null">
+                status=#{status},
+            </if>
+            <if test="email!=null">
+                email=#{email},
+            </if>
+            <if test="phone!=null">
+                phone=#{phone},
+            </if>
+            <if test="licensePhoto!=null">
+                license_photo=#{licensePhoto},
+            </if>
+            <if test="intro!=null">
+                intro=#{intro}
+            </if>
+        </set>
+        WHERE user_id=#{userId}
+    </update>
+
+    <select id="selectTotal" resultType="int">
+        select count(*) from exhibitor e
+        where e.status=#{value}
+    </select>
+
+    <delete id="deleteExhibitorByUserId">
+        DELETE FROM exhibitor WHERE user_id=#{value}
+    </delete>
+
+    <select id="selectCommonCategory" parameterType="int" resultType="CommonCategory">
+        SELECT * FROM common_category where user_id=#{VALUE}
+    </select>
+
+    <update id="updateCommonCategory" parameterType="CommonCategory">
+        UPDATE common_category set tag=#{tag}
+        WHERE user_id=#{userId}
+    </update>
+
+    <insert id="insertCommonCategory" parameterType="CommonCategory">
+        insert into common_category (tag, user_id) values (#{tag},#{userId})
+    </insert>
+</mapper>

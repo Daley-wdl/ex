@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+	<beans xmlns="http://www.springframework.org/schema/beans"
+		   xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+		   xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-4.0.xsd">
+
+<!--扫描注解-->
+	<context:component-scan base-package="com.exhibition.*"/>
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"/>
+		<property name="jdbcUrl" value="jdbc:mysql://115.159.70.237:3306/exhibition?useUnicode=true&amp;characterEncoding=UTF-8"/>
+		<!--<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/exhibition?useUnicode=true&amp;characterEncoding=UTF-8"/>-->
+		<property name="user" value="exhibition"/>
+		<property name="password" value="exhibition"/>
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="configLocation" value="classpath:mybatis-config.xml"/>
+		<!-- 使用别名 -->
+		<property name="typeAliasesPackage" value="com.exhibition.po"/>
+		<!-- mapper需要的xml文件 -->
+		<property name="mapperLocations" value="classpath:mapper/*.xml"/>
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 需要扫描的dao接口包 -->
+		<property name="basePackage" value="com.exhibition.dao"/>
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+	</bean>
+
+	<!-- 该bean用于加密用户密码和生成盐 -->
+	<bean id="passwordUtil" class="com.exhibition.utils.PasswordUtils">
+		<!-- md5迭代次数，应该与shiro配置中的次数保持一致 -->
+		<constructor-arg name="hashIterations" value="3"/>
+	</bean>
+
+	<!--开启字段AOP代理-->
+	<aop:aspectj-autoproxy/>
+
+	<!-- 开启事务 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"/>
+	</bean>
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+
+	<!-- 配置Spring的声明式事务 -->
+
+
+	<!--SolrJ配置-->
+	<bean id="solrClientBuilder" class="org.apache.solr.client.solrj.impl.HttpSolrClient.Builder">
+		<constructor-arg index="0" value="http://115.159.70.237:8080/solr/exhibition"/>
+		<!--<constructor-arg index="0" value="http://localhost:8080/solr/exhibition"/>-->
+	</bean>
+
+	<bean id="solrClient" class="org.apache.solr.client.solrj.impl.HttpSolrClient" factory-bean="solrClientBuilder" factory-method="build">
+	</bean>
+
+	<bean id="solrService" class="com.exhibition.solr.SolrServiceImpl">
+		<property name="solrClient" ref="solrClient"/>
+	</bean>
+
+	<!--验证码-->
+	<bean id="captchaProducer" class="com.google.code.kaptcha.impl.DefaultKaptcha">
+		<property name="config">
+			<bean class="com.google.code.kaptcha.util.Config">
+				<constructor-arg type="java.util.Properties">
+					<props>
+						<prop key="kaptcha.image.width">100</prop>
+						<prop key="kaptcha.image.height">50</prop>
+						<prop key="kaptcha.noise.impl">com.google.code.kaptcha.impl.NoNoise</prop>
+						<prop key="kaptcha.textproducer.char.string">0123456789abcdefghijklmnopqrstuvwxyz</prop>
+						<prop key="kaptcha.textproducer.char.length">4</prop>
+					</props>
+				</constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+</beans>

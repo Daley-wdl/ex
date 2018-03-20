@@ -1,0 +1,6 @@
+.text{
+	display: none;
+}
+.text:first-child{
+	display: block;
+}

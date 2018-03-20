@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.exhibition.dao.OrderCanceledItemDao">
+
+    <insert id="insertByBatch" parameterType="List">
+        INSERT INTO order_canceled_item
+        (order_item_id, order_id, exhibits_id, exhibitor_id, user_id, cancel_time, pic_img, exhibits_name, price, buy_number, product_amount)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.orderItemId},#{item.orderId},#{item.exhibitsId},#{item.exhibitorId},#{item.userId}
+            ,#{item.cancelTime},#{item.picImg},#{item.exhibitsName},#{item.price},#{item.buyNumber},#{item.productAmount})
+        </foreach>
+    </insert>
+
+    <delete id="delete" parameterType="int">
+        DELETE FROM order_canceled_item
+        WHERE id=#{value}
+    </delete>
+
+    <select id="getOrderCancaledItemForExhibitor" resultType="OrderCanceledItem">
+        select
+        oi.id,oi.order_id,oi.exhibits_id,oi.product_amount,oi.order_item_id,oi.user_id
+        ,oi.pic_img,oi.exhibits_name,oi.buy_number,oi.price,oi.cancel_time
+        from order_canceled_item oi ,exhibits e
+        WHERE oi.order_id=#{orderId} AND oi.exhibits_id=e.id AND e.exhibitor_id=#{exhibitorId}
+    </select>
+
+    <select id="getCountForExhibitor" parameterType="int" resultType="int">
+        select COUNT(*) from order_canceled_item where exhibitor_id=#{value}
+    </select>
+
+    <select id="getOrderCancaledItemForUser" parameterType="int" resultType="OrderCanceledItem">
+        select * from order_canceled_item where user_id=#{userId}
+        ORDER BY cancel_time
+        limit #{start},#{size}
+    </select>
+
+    <select id="getCountForUser" parameterType="int" resultType="int">
+        select COUNT(*) from order_canceled_item where user_id=#{value}
+    </select>
+
+    <select id="getOrderItemListByOrderIds" parameterType="list" resultType="OrderCanceledItem">
+        select * from order_canceled_item
+        WHERE order_canceled_item.order_id IN
+        <foreach collection="list" separator="," open="(" close=")" item="item" index="index">
+            #{item}
+        </foreach>
+    </select>
+
+</mapper>

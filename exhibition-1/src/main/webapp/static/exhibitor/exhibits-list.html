@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../layui/css/layui.css"/>
+    <script src="http://apps.bdimg.com/libs/jquery/1.8.3/jquery.min.js"></script>
+    <!--<script src="../js/jquery.min.js"></script>-->
+    <title>展品展示</title>
+    <style>
+
+    </style>
+</head>
+<body>
+
+<!--显示商品列表-->
+<table class="layui-table" id="displayTable" lay-filter="tableFilter">
+</table>
+
+<script src="../layui/layui.js"></script>
+<!--layui自定义模版-->
+<script type="text/html" id="exhibitsDetail">
+    <button onclick="showDetail(this)" value="{{d.id}}" class="layui-btn layui-btn-warm">详情</button>
+</script>
+<script type="text/html" id="exhibitsPhoto">
+    <button onclick="editPhoto(this)" value="{{d.id}}" class="layui-btn layui-btn-warm">编辑</button>
+</script>
+<script type="text/html" id="deleteExhibits">
+    <button value="{{d.id}}" lay-filter="deleteFilter" class="layui-btn layui-btn-danger"  lay-event="del">删除</button>
+</script>
+<script type="text/html" id="status">
+    {{#  if(d.status == 1){ }}
+    <i class="layui-icon" style="color: #1E9FFF;">&#x1005;已通过</i>
+    {{#  } }}
+    {{#  if(d.status == 0){ }}
+    <i class="layui-icon">&#xe606;待审核</i>
+    {{#  } }}
+    {{#  if(d.status == -1) { }}
+    <i class="layui-icon">&#x1006;未通过</i>
+    {{#  } }}
+</script>
+
+<script src="../js/common.js"></script>
+
+<script type="text/javascript">
+    layui.use(['layer', 'table','element'], function () {
+        var layer = layui.layer;
+        var table = layui.table;
+        var elememt = layui.element;
+//        $ = layer.$;
+
+        table.render({
+            elem: '#displayTable' //指定原始表格元素选择器
+            , url: getRootPath() + '/exhibits/selectExhibitsByExhibitor'
+            , height: 'full-50'
+            , skin: 'nob' //行边框风格
+            , even: true, //开启隔行背景
+            cols: [[//id,exhibitsName,category,mainPhotoPath,intro,creatTime
+                {field: 'id', title: 'ID', width: 80, sort: true},
+                {field: 'exhibitsName', title: '展品名', width: 200},
+                {field: 'category', title: '类别', width: 100},
+                {field: 'number', title: '数量', width: 100, sort: true},
+                {field: 'price', title: '价格', width: 100, sort: true},
+                {field: 'shipmentAmount', title: '快递费', width: 100},
+                {field: 'avgGrade', title: '好评度', width: 100},
+                {field: 'creatTime', title: '上传时间', width: 200, sort: true},
+                {field: 'intro', title: '介绍', width: 200},
+                {field: 'id', title: '更多', width: 100, templet: '#exhibitsDetail'},//查看详情
+                {field: 'id', title: '图片编辑', width: 100, templet: '#exhibitsPhoto'},//编辑图片
+                {field: 'id', title: '删除展品', width: 100, templet: '#deleteExhibits'},//删除
+                {field: 'status', title: '审核状态', width: 200, templet: '#status'}//审核状态
+            ]],
+            page: true,
+            request: {
+                pageName: 'page' //页码的参数名称，默认：page
+                , limitName: 'size' //每页数据量的参数名，默认：limit
+            },
+            limit: 30,//每页默认显示数量
+            limits: [10, 20, 30, 40, 50]
+        });
+
+        //删除按钮点击事件
+        table.on('tool(tableFilter)',function (obj) {
+            var data = obj.data; //获得当前行数据
+            var layEvent = obj.event; //获得 lay-event 对应的值
+            var tr = obj.tr; //获得当前行 tr 的DOM对象
+
+            if (layEvent=='del'){
+                var id = data.id;
+                layer.msg("确定删除该展品吗？", {
+                    icon: 5,
+                    time: 0,
+                    btn: ["确定", "取消"],
+                    yes: function (index) {
+                        layer.close(index);
+                        layer.load(1);
+                        $.ajax({
+                            url: getRootPath() + "/exhibits/deleteExhibits",
+                            type:"post",
+                            async:false,
+                            data:{exhibitsId:id},
+                            success:function (data) {
+                                layer.closeAll('loading');
+                                if (data.status==0) {
+                                    layer.msg(data.message,{
+                                        icon:5,
+                                        time:3000
+                                    });
+                                } else {
+                                    obj.del();//删除该节点
+                                    layer.msg("删除成功!",{
+                                        icon:6,
+                                        time:0,
+                                        btn:["ok"],
+                                        yes:function (index) {
+                                            layer.close(index);
+                                        }
+                                    });
+                                }
+                            },
+                            error:function (request, textStatus, errorThrown) {
+                                layer.closeAll('loading');
+                                console.log('删除展品失败--错误信息如下:'+request.responseText);
+                                layer.msg("删除失败！\n错误信息在控制台中打印,请与管理员联系!",{
+                                    icon:5,
+                                    time:0,
+                                    btn:['OK'],
+                                    yes:function (index) {
+                                        layer.close(index);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+
+            }
+        });
+
+    });
+
+    function editPhoto(item) {
+        var id = $(item).val();
+        window.open("exhibits-editPhoto.html?id=" + id);
+    }
+
+    function showDetail(item) {
+        var id = $(item).val();
+        parent.layer.open({
+            type:2,//层
+            title:'发布展品',
+            content: 'exhibits-detail.html?id='+id,
+            skin: 'layui-layer-molv',
+            area: ['600px', '700px'],
+            end: function () {
+                location.reload();
+            }
+        });
+    }
+
+</script>
+</body>
+</html>
